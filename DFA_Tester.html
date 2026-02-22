@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>DFA Complete Tester</title>
+    <link rel="stylesheet" href="DFA_Tester_CSS.css">
+</head>
+<body>
+
+<div class="top-row">
+    <div class="info-box">
+        <div class="label">RegEx Pattern <span id="patternIndex">1</span></div>
+        <div class="regex-text" id="regexDisplay">Loading...</div>
+        <div class="label">Sequence Pattern Tracker</div>
+        <div id="pathTracker">Ready...</div>
+    </div>
+    <div class="canvas-container">
+        <canvas id="dfaCanvas"></canvas>
+    </div>
+</div>
+
+<div class="bottom-row">
+    <div class="input-grid" id="inputGrid"></div>
+    <button class="btn-execute-all" id="executeAllBtn" onclick="executeAll()">RUN BATCH TEST</button>
+</div>
+
+<div class="nav-footer">
+    <button class="btn-nav" id="prevBtn" onclick="changePattern(-1)">← Previous RegEx</button>
+    <button class="btn-nav" id="nextBtn" onclick="changePattern(1)">Next RegEx →</button>
+</div>
+
+<script src="DFA_Tester_JS.js"></script>
+</body>
+</html>

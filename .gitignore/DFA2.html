@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>DFA Complete Tester</title>
+    <style>
+        body { background: #0a0a0a; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        
+        /* Upper Section */
+        .top-row { display: flex; width: 100%; max-width: 1300px; gap: 20px; margin-bottom: 20px; height: 420px; }
+        
+        .info-box { background: #141414; padding: 20px; border-radius: 12px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.7); flex: 1; display: flex; flex-direction: column; }
+        .canvas-container { flex: 2; background: #ffffff; border-radius: 12px; overflow: hidden; position: relative; border: 2px solid #333; }
+
+        .label { color: #0078d4; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 2px; }
+        .regex-text { font-family: 'Consolas', monospace; font-size: 0.9rem; color: #50fa7b; background: #000; padding: 12px; border-radius: 6px; border: 1px solid #222; margin-bottom: 15px; }
+        
+        /* Lower Section: 7 Inputs */
+        .bottom-row { width: 100%; max-width: 1300px; background: #141414; padding: 25px; border-radius: 12px; border: 1px solid #333; }
+        
+        .input-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; margin-bottom: 25px; }
+
+        .input-group { display: flex; align-items: center; background: #1e1e1e; padding: 8px 12px; border-radius: 8px; border: 1px solid #444; }
+        .input-group input { flex: 1; background: transparent; border: none; color: #00ff00; font-family: monospace; font-size: 16px; outline: none; }
+        
+        .btn-simulate { background: #0078d4; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; margin-left: 8px; transition: 0.2s; }
+        .btn-simulate:hover { background: #005a9e; }
+        
+        .btn-execute-all { background: #28a745; color: white; border: none; padding: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 18px; width: 100%; letter-spacing: 1px; transition: 0.3s; }
+        .btn-execute-all:hover { background: #218838; box-shadow: 0 0 15px rgba(40, 167, 69, 0.4); }
+        .btn-execute-all:disabled, .btn-simulate:disabled { background: #333; color: #777; cursor: not-allowed; }
+
+        .status-dot { width: 14px; height: 14px; border-radius: 50%; margin-left: 12px; background: #333; border: 1px solid #000; }
+        .status-pass { background: #00ff00; box-shadow: 0 0 10px #00ff00; }
+        .status-fail { background: #ff4444; box-shadow: 0 0 10px #ff4444; }
+
+        #pathTracker { font-size: 0.85rem; color: #aaa; font-family: monospace; background: #000; padding: 10px; border-radius: 4px; flex-grow: 1; overflow-y: auto; border: 1px solid #222; }
+        canvas { width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+
+<div class="top-row">
+    <div class="info-box">
+        <div class="label">Regular Expression (L)</div>
+        <div class="regex-text">((101)⁺+(111)*+100)+(1+0+11)*(1+0+01)*(111+000+101)(1+0)*</div>
+        <div class="label">Sequence Pattern Tracker</div>
+        <div id="pathTracker">Idle...</div>
+    </div>
+    
+    <div class="canvas-container">
+        <canvas id="dfaCanvas"></canvas>
+    </div>
+</div>
+
+<div class="bottom-row">
+    <div class="input-grid" id="inputGrid"></div>
+    <button class="btn-execute-all" id="executeAllBtn" onclick="executeAll()">EXECUTE ALL INPUTS</button>
+</div>
+
+<script>
+    const canvas = document.getElementById('dfaCanvas');
+    const ctx = canvas.getContext('2d');
+    const pathTracker = document.getElementById('pathTracker');
+    
+    // Core DFA Logic
+    const dfa = {
+        start: 'q0',
+        states: {
+            'q0': { x: 60,  y: 200, next: { '0': 'q1', '1': 'q2' }, accept: false },
+            'q1': { x: 180, y: 100, next: { '0': 'q3', '1': 'q4' }, accept: false },
+            'q2': { x: 180, y: 300, next: { '0': 'q5', '1': 'q6' }, accept: false },
+            'q3': { x: 320, y: 60,  next: { '0': 'ACC', '1': 'q1' }, accept: false },
+            'q4': { x: 320, y: 150, next: { '0': 'ACC', '1': 'q2' }, accept: false },
+            'q5': { x: 320, y: 250, next: { '0': 'ACC', '1': 'ACC' }, accept: false },
+            'q6': { x: 320, y: 340, next: { '0': 'q5', '1': 'ACC' }, accept: false },
+            'ACC':{ x: 550, y: 200, next: { '0': 'ACC', '1': 'ACC' }, accept: true }
+        }
+    };
+
+    let currentState = dfa.start;
+    let activeEdge = null;
+
+    // Create the 7 Input Slots
+    const grid = document.getElementById('inputGrid');
+    for(let i=1; i<=7; i++) {
+        grid.innerHTML += `
+            <div class="input-group">
+                <input type="text" id="input${i}" placeholder="Enter binary ${i}...">
+                <button class="btn-simulate" onclick="simulate(${i})" id="btn${i}">Simulate</button>
+                <div class="status-dot" id="dot${i}"></div>
+            </div>`;
+    }
+
+    function resize() {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        draw();
+    }
+    window.onresize = resize;
+    setTimeout(resize, 0);
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Transitions
+        Object.keys(dfa.states).forEach(id => {
+            const s = dfa.states[id];
+            for (let char in s.next) {
+                const target = dfa.states[s.next[char]];
+                const active = activeEdge && activeEdge.from === id && activeEdge.to === s.next[char];
+                ctx.beginPath();
+                ctx.lineWidth = active ? 4 : 1.5;
+                ctx.strokeStyle = active ? "#0078d4" : "#bbb";
+                ctx.moveTo(s.x, s.y); ctx.lineTo(target.x, target.y);
+                ctx.stroke();
+                
+                ctx.fillStyle = active ? "#0078d4" : "#666";
+                ctx.font = "bold 12px Arial";
+                ctx.fillText(char, (s.x + target.x)/2, (s.y + target.y)/2 - 8);
+            }
+        });
+
+        // States
+        Object.keys(dfa.states).forEach(id => {
+            const s = dfa.states[id];
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, 25, 0, Math.PI*2);
+            ctx.fillStyle = (currentState === id) ? "#0078d4" : "#fff";
+            ctx.fill();
+            ctx.lineWidth = s.accept ? 5 : 2;
+            ctx.strokeStyle = "#1a1a1a";
+            ctx.stroke();
+            if(s.accept) { ctx.beginPath(); ctx.arc(s.x, s.y, 20, 0, Math.PI*2); ctx.stroke(); }
+            ctx.fillStyle = (currentState === id) ? "#fff" : "#000";
+            ctx.font = "bold 11px Arial"; ctx.textAlign = "center";
+            ctx.fillText(id, s.x, s.y+4);
+        });
+    }
+
+    async function simulate(index, isBatch = false) {
+        const inputEl = document.getElementById(`input${index}`);
+        const dot = document.getElementById(`dot${index}`);
+        const val = inputEl.value;
+        if (!/^[01]*$/.test(val) || val === "") return;
+
+        const allButtons = document.querySelectorAll('button');
+        allButtons.forEach(b => b.disabled = true);
+        
+        currentState = dfa.start;
+        let path = [dfa.start];
+        pathTracker.innerText = `Testing [${index}]: ` + path.join(" → ");
+        dot.className = "status-dot";
+        draw();
+
+        for (let char of val) {
+            const nextState = dfa.states[currentState].next[char];
+            activeEdge = { from: currentState, to: nextState };
+            draw();
+            await new Promise(r => setTimeout(r, 200));
+            currentState = nextState;
+            path.push(currentState);
+            pathTracker.innerText = `Testing [${index}]: ` + path.join(" → ");
+            activeEdge = null;
+            draw();
+            await new Promise(r => setTimeout(r, 100));
+        }
+
+        const isAccepted = dfa.states[currentState].accept;
+        dot.className = "status-dot " + (isAccepted ? "status-pass" : "status-fail");
+        allButtons.forEach(b => b.disabled = false);
+    }
+
+    async function executeAll() {
+        const btn = document.getElementById('executeAllBtn');
+        btn.disabled = true;
+        for(let i=1; i<=7; i++) {
+            await simulate(i, true);
+            await new Promise(r => setTimeout(r, 400));
+        }
+        btn.disabled = false;
+        pathTracker.innerText = "All batch tests processed.";
+    }
+</script>
+</body>
+</html>
