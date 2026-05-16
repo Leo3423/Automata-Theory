@@ -18,19 +18,20 @@ const automataData = {
             'S9': { 'a': 'S10', 'b': 'S9' },
             'S10': { 'a': 'S8', 'b': 'S9' }
         },
+        // Refactored Coordinate Map for maximum readability on Alphabet {a, b}
         nodes: {
             'S0':  { x: 60,  y: 200 },
-            'S1':  { x: 180, y: 70 },
-            'T':   { x: 180, y: 200 },
-            'S2':  { x: 180, y: 330 },
-            'S3':  { x: 310, y: 200 },
-            'S4':  { x: 440, y: 100 },
-            'S5':  { x: 440, y: 300 },
-            'S6':  { x: 560, y: 100 },
-            'S7':  { x: 560, y: 300 },
-            'S8':  { x: 680, y: 100 },
-            'S9':  { x: 680, y: 300 },
-            'S10': { x: 780, y: 200 }
+            'S1':  { x: 180, y: 90  },
+            'S2':  { x: 180, y: 310 },
+            'T':   { x: 300, y: 200 }, // Placed centered near front to visually anchor traps
+            'S3':  { x: 420, y: 200 },
+            'S4':  { x: 540, y: 90  },
+            'S5':  { x: 540, y: 310 },
+            'S6':  { x: 660, y: 90  },
+            'S7':  { x: 660, y: 310 },
+            'S8':  { x: 780, y: 90  },
+            'S9':  { x: 780, y: 310 },
+            'S10': { x: 880, y: 200 }
         },
         cfg: `S  → A B C D\nA  → aa | bb\nB  → aB | bB | ε\nC  → a | b | ab | ba\nD  → aD | bD | aaD | bbD | ε`,
         pda: [
@@ -86,23 +87,24 @@ const automataData = {
             'S14': { '1': 'S14', '0': 'S13' },
             'S15': { '1': 'S7',  '0': 'S13' }
         },
+        // Refactored Structured Coordinate Matrix Map for Alphabet {0, 1}
         nodes: {
-            'S0':  { x: 50,  y: 110 },
-            'S1':  { x: 150, y: 110 },
-            'S3':  { x: 260, y: 110 },
-            'S7':  { x: 390, y: 110 },
-            'S15': { x: 510, y: 110 },
-            'S13': { x: 630, y: 110 },
-            'S14': { x: 760, y: 110 },
-            'S2':  { x: 50,  y: 250 },
-            'S4':  { x: 340, y: 250 },
-            'S12': { x: 450, y: 200 },
-            'S9':  { x: 700, y: 260 },
-            'S5':  { x: 210, y: 370 },
-            'S6':  { x: 410, y: 370 },
-            'S11': { x: 630, y: 350 },
-            'S8':  { x: 310, y: 460 },
-            'S10': { x: 210, y: 480 }
+            'S0':  { x: 50,  y: 240 },
+            'S1':  { x: 160, y: 120 },
+            'S2':  { x: 160, y: 360 },
+            'S3':  { x: 280, y: 70  },
+            'S4':  { x: 280, y: 190 },
+            'S5':  { x: 280, y: 300 },
+            'S6':  { x: 280, y: 420 },
+            'S7':  { x: 420, y: 70  },
+            'S8':  { x: 420, y: 230 },
+            'S11': { x: 420, y: 420 },
+            'S12': { x: 560, y: 70  },
+            'S9':  { x: 560, y: 230 },
+            'S10': { x: 560, y: 350 },
+            'S15': { x: 680, y: 70  },
+            'S13': { x: 680, y: 230 },
+            'S14': { x: 800, y: 230 }
         },
         cfg: `S  → X Y Z\nX  → 101 | 111X | 100 | ε\nY  → 1Y | 0Y | 01Y | ε\nZ  → 111 | 000 | 101`,
         pda: [
@@ -140,7 +142,6 @@ let currentAlphabet = 'ab';
 let currentTab = 'dfa';
 let activeAnimationTimeout = null;
 
-// DOM Event Bindings
 document.addEventListener("DOMContentLoaded", () => {
     renderRows();
     updateWorkspace();
@@ -235,14 +236,13 @@ function updateWorkspace() {
     renderPDAGraph();
 }
 
-// Vector Graphics Engine for DFA Graph Layout
 function renderSVGGraph(activeState = null, activeTransition = null) {
     const data = automataData[currentAlphabet];
     const container = document.getElementById('canvas-container');
     if (!container) return;
     
-    const viewWidth = 840;
-    const viewHeight = currentAlphabet === 'ab' ? 400 : 540;
+    const viewWidth = 940;
+    const viewHeight = currentAlphabet === 'ab' ? 420 : 500;
     const nodeRadius = 20;
 
     let svgHtml = `<svg width="${viewWidth}" height="${viewHeight}" viewBox="0 0 ${viewWidth} ${viewHeight}" class="mx-auto">`;
@@ -298,15 +298,14 @@ function renderSVGGraph(activeState = null, activeTransition = null) {
                 let textX = (x1 + x2) / 2;
                 let textY = (y1 + y2) / 2 - 7;
 
-                const needsCurving = (currentAlphabet === 'ab' && src === 'S7' && dest === 'S10') || 
-                                     (currentAlphabet === '01' && src === 'S7' && dest === 'S13') ||
-                                     (currentAlphabet === '01' && src === 'S3' && dest === 'S8') ||
-                                     (currentAlphabet === '01' && src === 'S10' && dest === 'S14') ||
-                                     dist > 220;
+                // Intelligently curve overlapping back-loops and broad transitions to remain completely scannable
+                const isOverlappingLoop = (currentAlphabet === 'ab' && ((src === 'S8' && dest === 'S9') || (src === 'S9' && dest === 'S10') || (src === 'S10' && dest === 'S8'))) ||
+                                           (currentAlphabet === '01' && ((src === 'S7' && dest === 'S13') || (src === 'S13' && dest === 'S9') || (src === 'S9' && dest === 'S13') || (src === 'S6' && dest === 'S5') || (src === 'S5' && dest === 'S10')));
 
-                if (needsCurving) {
-                    let bendMultiplier = (src === 'S7' && dest === 'S10') ? 55 : 35;
-                    if (src === 'S10' && dest === 'S14') bendMultiplier = -65; 
+                if (isOverlappingLoop || dist > 180) {
+                    let bendMultiplier = 40;
+                    if (src === 'S9' && dest === 'S13') bendMultiplier = -40;
+                    if (src === 'S10' && dest === 'S8') bendMultiplier = -60;
                     
                     const mx = (nSrc.x + nDest.x) / 2;
                     const my = (nSrc.y + nDest.y) / 2;
@@ -332,8 +331,8 @@ function renderSVGGraph(activeState = null, activeTransition = null) {
         const isStart = nodeId === data.startState;
         const isActiveNode = activeState === nodeId;
 
-        let fillStyle = isActiveNode ? '#064e3b' : '#1e293b';
-        let strokeStyle = isActiveNode ? '#10b981' : (isAccept ? '#10b981' : '#475569');
+        let fillStyle = isActiveNode ? '#064e3b' : (nodeId === 'T' || nodeId === 'Trap' ? '#311018' : '#1e293b');
+        let strokeStyle = isActiveNode ? '#10b981' : (isAccept ? '#10b981' : (nodeId === 'T' || nodeId === 'Trap' ? '#f43f5e' : '#475569'));
         let textColor = isActiveNode ? '#ffffff' : '#f8fafc';
 
         svgHtml += `
@@ -360,7 +359,6 @@ function renderSVGGraph(activeState = null, activeTransition = null) {
     container.innerHTML = svgHtml;
 }
 
-// Sipser Formal Architecture Flowchart Rendering Engine for the PDA View Canvas
 function renderPDAGraph() {
     const data = automataData[currentAlphabet];
     const container = document.getElementById('pda-canvas-container');
@@ -458,7 +456,6 @@ function clearAllInputs() {
     renderSVGGraph();
 }
 
-// FIXED: Immediately abort and terminate loop parsing when a transition lands inside a Trap state node
 function validateSingle(index, onCompleteCallback = null) {
     if (activeAnimationTimeout) clearInterval(activeAnimationTimeout);
     
@@ -502,14 +499,13 @@ function validateSingle(index, onCompleteCallback = null) {
             currentState = nextState;
             fullPathTraceString.push(currentState);
 
-            // IMMEDIATE TERMINATION CORE LOGIC: Break out immediately upon hitting dead ends
             if (currentState === 'T' || currentState === 'Trap') {
                 isValid = false;
                 break; 
             }
         } else {
             isValid = false;
-            fullPathTraceString.push('T'); // Default to designated system trap identifier
+            fullPathTraceString.push('T');
             break;
         }
     }
