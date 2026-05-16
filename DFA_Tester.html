@@ -1,34 +1,137 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>DFA Complete Tester</title>
-    <link rel="stylesheet" href="DFA_Tester_CSS.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automata & Formal Languages Interactive Workspace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&family=Fira+Code:wght=400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-<div class="top-row">
-    <div class="info-box">
-        <div class="label">RegEx Pattern <span id="patternIndex">1</span></div>
-        <div class="regex-text" id="regexDisplay">Loading...</div>
-        <div class="label">Sequence Pattern Tracker</div>
-        <div id="pathTracker">Ready...</div>
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-600 text-white p-2 rounded-xl font-bold shadow-md shadow-indigo-200">
+                    ∑
+                </div>
+                <div>
+                    <span class="text-lg font-bold text-slate-900 tracking-tight">AutomataLab</span>
+                    <span class="text-xs block text-slate-500 font-medium -mt-1">Interactive Tracing System</span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 bg-slate-100 p-1 rounded-xl">
+                <button id="btn-ab" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm bg-white text-indigo-600">
+                    Alphabet {a, b}
+                </button>
+                <button id="btn-01" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900">
+                    Alphabet {0, 1}
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex-1 py-8 w-full grid grid-cols-1 lg:grid-cols-4 gap-8">
+        
+        <aside class="lg:col-span-1 space-y-2">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">Component View</p>
+            <nav class="space-y-1">
+                <button id="tab-dfa" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-indigo-50 text-indigo-700 border-l-4 border-indigo-600">
+                    <span>Deterministic Finite Automata (DFA)</span>
+                </button>
+                <button id="tab-cfg" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-100">
+                    <span>Context-Free Grammar (CFG)</span>
+                </button>
+                <button id="tab-pda" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-100">
+                    <span>Pushdown Automata (PDA)</span>
+                </button>
+            </nav>
+
+            <div class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-2xl p-5 mt-6 shadow-xl">
+                <h4 class="text-xs font-bold text-indigo-300 uppercase tracking-wider mb-2">Active Definition</h4>
+                <div id="sidebar-meta" class="space-y-3 text-sm"></div>
+            </div>
+        </aside>
+
+        <main class="lg:col-span-3 space-y-6">
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <span class="text-xs font-bold text-indigo-600 uppercase tracking-widest bg-indigo-50 px-2.5 py-1 rounded-md">Regular Expression Rule Set</span>
+                <div id="regex-display" class="mt-3 text-md font-mono font-semibold text-slate-800 break-all leading-relaxed"></div>
+            </div>
+
+            <div id="view-dfa" class="space-y-6">
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col">
+                    <div class="mb-4">
+                        <h3 class="text-lg font-bold text-slate-900">Live DFA Transition Graph Viewer</h3>
+                        <p class="text-sm text-slate-500">Fixed boundary-aware offsets ensure visible arrow directionalities across all states.</p>
+                    </div>
+                    <div class="border border-slate-100 rounded-xl bg-slate-900 overflow-hidden relative flex justify-center items-center p-4">
+                        <div id="canvas-container" class="w-full overflow-x-auto"></div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900">Sequence Tester Matrix</h3>
+                            <p class="text-sm text-slate-500">Provide strings to evaluate state tracing paths across the verified structures.</p>
+                        </div>
+                    </div>
+
+                    <div id="matrix-rows" class="space-y-3"></div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                        <button id="btn-clear" class="px-4 py-2 border border-slate-200 text-slate-600 font-medium rounded-xl text-sm hover:bg-slate-50 transition">
+                            Clear Matrix
+                        </button>
+                        <button id="btn-validate-all" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm shadow-md shadow-indigo-100 transition">
+                            Validate All Outputs
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-cfg" class="hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+                <h3 class="text-xl font-bold text-slate-900">Context-Free Grammar (CFG) Specification</h3>
+                <div class="bg-slate-900 text-emerald-400 p-6 rounded-xl font-mono text-sm leading-relaxed whitespace-pre" id="cfg-rules"></div>
+            </div>
+
+            <div id="view-pda" class="hidden space-y-6">
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col">
+                    <div class="mb-4">
+                        <h3 class="text-lg font-bold text-slate-900">Live PDA Transition Graph Viewer</h3>
+                        <p class="text-sm text-slate-500">Displays state loops containing stack mutations in the classic format: <code>input, pop / push</code>.</p>
+                    </div>
+                    <div class="border border-slate-100 rounded-xl bg-slate-900 overflow-hidden relative flex justify-center items-center p-4">
+                        <div id="pda-canvas-container" class="w-full overflow-x-auto"></div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+                    <h3 class="text-xl font-bold text-slate-900">Formal Delta Transition Matrix</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 font-semibold">
+                                    <th class="p-3">Current State</th>
+                                    <th class="p-3">Input Symbol</th>
+                                    <th class="p-3">Pop Stack</th>
+                                    <th class="p-3">Next State</th>
+                                    <th class="p-3">Push Stack</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pda-table-body" class="divide-y divide-slate-100 text-slate-700 font-mono"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
     </div>
-    <div class="canvas-container">
-        <canvas id="dfaCanvas"></canvas>
-    </div>
-</div>
 
-<div class="bottom-row">
-    <div class="input-grid" id="inputGrid"></div>
-    <button class="btn-execute-all" id="executeAllBtn" onclick="executeAll()">RUN BATCH TEST</button>
-</div>
-
-<div class="nav-footer">
-    <button class="btn-nav" id="prevBtn" onclick="changePattern(-1)">← Previous RegEx</button>
-    <button class="btn-nav" id="nextBtn" onclick="changePattern(1)">Next RegEx →</button>
-</div>
-
-<script src="DFA_Tester_JS.js"></script>
+    <script src="DFA_Tester_JS.js"></script>
 </body>
 </html>
