@@ -528,6 +528,8 @@ code, pre {
     font-size: 0.7rem;
     color: var(--app-muted);
     margin-top: 0.15rem;
+    word-break: break-word;
+    white-space: normal;
 }
 
 .spinner {
@@ -636,7 +638,7 @@ svg text.graph-label {
 }
 
 .dfa-layout-docked #dfa-tester-card .test-row {
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     gap: 0.35rem;
 }
 
