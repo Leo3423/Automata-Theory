@@ -19,17 +19,17 @@ const automataData = {
             'S10': { 'a': 'S8', 'b': 'S9' }
         },
         nodes: {
-            'S0':  { x: 60,  y: 200 },
-            'S1':  { x: 180, y: 90  },
-            'S2':  { x: 180, y: 310 },
-            'T':   { x: 300, y: 200 },
-            'S3':  { x: 420, y: 200 },
-            'S4':  { x: 540, y: 90  },
-            'S5':  { x: 540, y: 310 },
-            'S6':  { x: 660, y: 90  },
-            'S7':  { x: 660, y: 310 },
-            'S8':  { x: 780, y: 90  },
-            'S9':  { x: 780, y: 310 },
+            'S0': { x: 60, y: 200 },
+            'S1': { x: 180, y: 90 },
+            'S2': { x: 180, y: 310 },
+            'T': { x: 300, y: 200 },
+            'S3': { x: 420, y: 200 },
+            'S4': { x: 540, y: 90 },
+            'S5': { x: 540, y: 310 },
+            'S6': { x: 660, y: 90 },
+            'S7': { x: 660, y: 310 },
+            'S8': { x: 780, y: 90 },
+            'S9': { x: 780, y: 310 },
             'S10': { x: 880, y: 200 }
         },
         cfg: `S  → A B C D\nA  → aa | bb\nB  → aB | bB | ε\nC  → a | b | ab | ba\nD  → aD | bD | aaD | bbD | ε`,
@@ -42,9 +42,9 @@ const automataData = {
             { id: 'b_start', type: 'rect', label: 'Start', x: 200, y: 30, w: 90, h: 40 },
             { id: 'b_read1', type: 'diamond', label: 'Read', x: 200, y: 130, w: 100, h: 60 },
             { id: 'b_push1', type: 'rect', label: 'Push X', x: 40, y: 140, w: 90, h: 40 },
-            { id: 'b_pop1',  type: 'diamond', label: 'Pop', x: 200, y: 260, w: 100, h: 60 },
+            { id: 'b_pop1', type: 'diamond', label: 'Pop', x: 200, y: 260, w: 100, h: 60 },
             { id: 'b_read2', type: 'diamond', label: 'Read', x: 420, y: 260, w: 100, h: 60 },
-            { id: 'b_pop2',  type: 'diamond', label: 'Pop', x: 640, y: 130, w: 100, h: 60 },
+            { id: 'b_pop2', type: 'diamond', label: 'Pop', x: 640, y: 130, w: 100, h: 60 },
             { id: 'b_accept', type: 'rect', label: 'Accept', x: 645, y: 30, w: 90, h: 40 },
             { id: 'b_reject', type: 'rect', label: 'Reject', x: 425, y: 410, w: 90, h: 40 }
         ],
@@ -69,38 +69,38 @@ const automataData = {
         startState: 'S0',
         acceptStates: ['S7', 'S9', 'S11', 'S12', 'S13', 'S14', 'S15'],
         transitions: {
-            'S0':  { '1': 'S1',  '0': 'S2' },
-            'S1':  { '1': 'S3',  '0': 'S4' },
-            'S2':  { '1': 'S5',  '0': 'S6' },
-            'S3':  { '1': 'S7',  '0': 'S8' },
-            'S4':  { '1': 'S9',  '0': 'S6' },
-            'S5':  { '1': 'S10', '0': 'S8' },
-            'S6':  { '1': 'S5',  '0': 'S11' },
-            'S7':  { '1': 'S12', '0': 'S13' },
-            'S8':  { '1': 'S9',  '0': 'S6' },
-            'S9':  { '1': 'S14', '0': 'S13' },
+            'S0': { '1': 'S1', '0': 'S2' },
+            'S1': { '1': 'S3', '0': 'S4' },
+            'S2': { '1': 'S5', '0': 'S6' },
+            'S3': { '1': 'S7', '0': 'S8' },
+            'S4': { '1': 'S9', '0': 'S6' },
+            'S5': { '1': 'S10', '0': 'S8' },
+            'S6': { '1': 'S5', '0': 'S11' },
+            'S7': { '1': 'S12', '0': 'S13' },
+            'S8': { '1': 'S9', '0': 'S6' },
+            'S9': { '1': 'S14', '0': 'S13' },
             'S10': { '1': 'S14', '0': 'S8' },
-            'S11': { '1': 'S9',  '0': 'S11' },
+            'S11': { '1': 'S9', '0': 'S11' },
             'S12': { '1': 'S15', '0': 'S13' },
-            'S13': { '1': 'S9',  '0': 'S11' },
+            'S13': { '1': 'S9', '0': 'S11' },
             'S14': { '1': 'S14', '0': 'S13' },
-            'S15': { '1': 'S7',  '0': 'S13' }
+            'S15': { '1': 'S7', '0': 'S13' }
         },
         nodes: {
-            'S0':  { x: 50,  y: 240 },
-            'S1':  { x: 160, y: 120 },
-            'S2':  { x: 160, y: 360 },
-            'S3':  { x: 280, y: 70  },
-            'S4':  { x: 280, y: 190 },
-            'S5':  { x: 280, y: 300 },
-            'S6':  { x: 280, y: 420 },
-            'S7':  { x: 420, y: 70  },
-            'S8':  { x: 420, y: 230 },
+            'S0': { x: 50, y: 240 },
+            'S1': { x: 160, y: 120 },
+            'S2': { x: 160, y: 360 },
+            'S3': { x: 280, y: 70 },
+            'S4': { x: 280, y: 190 },
+            'S5': { x: 280, y: 300 },
+            'S6': { x: 280, y: 420 },
+            'S7': { x: 420, y: 70 },
+            'S8': { x: 420, y: 230 },
             'S11': { x: 420, y: 420 },
-            'S12': { x: 560, y: 70  },
-            'S9':  { x: 560, y: 230 },
+            'S12': { x: 560, y: 70 },
+            'S9': { x: 560, y: 230 },
             'S10': { x: 560, y: 350 },
-            'S15': { x: 680, y: 70  },
+            'S15': { x: 680, y: 70 },
             'S13': { x: 680, y: 230 },
             'S14': { x: 800, y: 230 }
         },
@@ -110,12 +110,12 @@ const automataData = {
             { curr: 'p0', input: '0', pop: '1', next: 'p1', push: 'ε' }
         ],
         pdaBlocks: [
-            { id: 'b2_start',  type: 'rect', label: 'Start', x: 200, y: 30, w: 90, h: 40 },
-            { id: 'b2_read1',  type: 'diamond', label: 'Read', x: 200, y: 130, w: 100, h: 60 },
-            { id: 'b2_push1',  type: 'rect', label: 'Push 1', x: 40, y: 140, w: 90, h: 40 },
-            { id: 'b2_pop1',   type: 'diamond', label: 'Pop', x: 200, y: 260, w: 100, h: 60 },
-            { id: 'b2_read2',  type: 'diamond', label: 'Read', x: 420, y: 260, w: 100, h: 60 },
-            { id: 'b2_pop2',   type: 'diamond', label: 'Pop', x: 640, y: 130, w: 100, h: 60 },
+            { id: 'b2_start', type: 'rect', label: 'Start', x: 200, y: 30, w: 90, h: 40 },
+            { id: 'b2_read1', type: 'diamond', label: 'Read', x: 200, y: 130, w: 100, h: 60 },
+            { id: 'b2_push1', type: 'rect', label: 'Push 1', x: 40, y: 140, w: 90, h: 40 },
+            { id: 'b2_pop1', type: 'diamond', label: 'Pop', x: 200, y: 260, w: 100, h: 60 },
+            { id: 'b2_read2', type: 'diamond', label: 'Read', x: 420, y: 260, w: 100, h: 60 },
+            { id: 'b2_pop2', type: 'diamond', label: 'Pop', x: 640, y: 130, w: 100, h: 60 },
             { id: 'b2_accept', type: 'rect', label: 'Accept', x: 645, y: 30, w: 90, h: 40 },
             { id: 'b2_reject', type: 'rect', label: 'Reject', x: 425, y: 410, w: 90, h: 40 }
         ],
@@ -171,12 +171,19 @@ function bindGlobalEvents() {
     document.getElementById('btn-theme-toggle').addEventListener('click', toggleTheme);
     document.getElementById('btn-add-row').addEventListener('click', addTestRow);
     document.getElementById('btn-clear-all').addEventListener('click', clearAllTestRows);
+    document.getElementById('btn-validate-all').addEventListener('click', validateAllRows);
     document.getElementById('btn-zoom-in').addEventListener('click', () => adjustGraphZoom(1.2));
     document.getElementById('btn-zoom-out').addEventListener('click', () => adjustGraphZoom(1 / 1.2));
     document.getElementById('btn-zoom-reset').addEventListener('click', () => fitGraphToView());
     document.getElementById('btn-trace-prev').addEventListener('click', () => stepTrace(-1));
     document.getElementById('btn-trace-next').addEventListener('click', () => stepTrace(1));
     document.getElementById('btn-trace-play').addEventListener('click', playTraceAnimation);
+    document.getElementById('trace-replay-select').addEventListener('change', (e) => {
+        const idx = e.target.value;
+        if (idx === '') return;
+        replayTrace(parseInt(idx, 10));
+        e.target.value = '';
+    });
 
     const btnRegexFormat = document.getElementById('btn-regex-format');
     if (btnRegexFormat) {
@@ -189,7 +196,112 @@ function bindGlobalEvents() {
 
     const canvasContainer = document.getElementById('canvas-container');
     canvasContainer.addEventListener('mousemove', onGraphMouseMove);
-    canvasContainer.addEventListener('mouseleave', hideGraphTooltip);
+    canvasContainer.addEventListener('mouseleave', (e) => {
+        isDraggingGraph = false;
+        canvasContainer.style.cursor = 'grab';
+        hideGraphTooltip();
+    });
+
+    canvasContainer.addEventListener('mousedown', (e) => {
+        isDraggingGraph = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        startViewBoxX = graphViewBox.x;
+        startViewBoxY = graphViewBox.y;
+        canvasContainer.style.cursor = 'grabbing';
+    });
+
+    window.addEventListener('mouseup', () => {
+        if (isDraggingGraph) {
+            isDraggingGraph = false;
+            canvasContainer.style.cursor = 'grab';
+        }
+    });
+
+    document.getElementById('btn-finalize').addEventListener('click', toggleDockMode);
+    document.getElementById('btn-clear-history').addEventListener('click', clearHistory);
+}
+
+function addHistoryEntry(inputStr, accepted, frames) {
+    const list = document.getElementById('history-list');
+    const empty = document.getElementById('history-empty');
+    if (empty) empty.remove();
+
+    // Store frames for replay
+    const historyIdx = traceHistory.length;
+    traceHistory.push({ inputStr, accepted, frames });
+
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    item.innerHTML = `
+        <span class="history-string" title="${inputStr}">${inputStr || '(empty)'}</span>
+        <span class="${accepted ? 'history-badge-accepted' : 'history-badge-rejected'}">${accepted ? 'Accepted' : 'Rejected'}</span>
+    `;
+    list.prepend(item);
+
+    // Add to replay dropdown (newest on top = index 0 visible at bottom of list)
+    updateReplayDropdown();
+}
+
+function clearHistory() {
+    const list = document.getElementById('history-list');
+    list.innerHTML = '<p id="history-empty" class="text-[11px] app-muted italic text-center py-4">No validations yet.</p>';
+    traceHistory = [];
+    updateReplayDropdown();
+}
+
+let traceHistory = [];
+
+function updateReplayDropdown() {
+    const select = document.getElementById('trace-replay-select');
+    if (!select) return;
+    // Keep the placeholder option, rebuild the rest
+    select.innerHTML = '<option value="">— pick a string —</option>';
+    // Show newest first
+    for (let i = traceHistory.length - 1; i >= 0; i--) {
+        const entry = traceHistory[i];
+        const label = `${entry.inputStr || '(empty)'}  [${entry.accepted ? '✓' : '✗'}]`;
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = label;
+        select.appendChild(opt);
+    }
+}
+
+function replayTrace(historyIdx) {
+    const entry = traceHistory[historyIdx];
+    if (!entry) return;
+    if (activeAnimationTimeout) clearInterval(activeAnimationTimeout);
+    activeTrace.frames = entry.frames;
+    activeTrace.index = 0;
+    activeTrace.playing = false;
+    showTraceControls();
+    renderTraceStep();
+    if (currentTab === 'dfa') playTraceAnimation();
+}
+
+
+let isDocked = false;
+let isDraggingGraph = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let startViewBoxX = 0;
+let startViewBoxY = 0;
+
+function toggleDockMode() {
+    isDocked = !isDocked;
+    const layout = document.getElementById('dfa-layout');
+    const btn = document.getElementById('btn-finalize');
+
+    if (isDocked) {
+        layout.className = 'dfa-layout-docked';
+        btn.innerHTML = 'Undock';
+        btn.style.background = '#d97706';
+    } else {
+        layout.className = 'dfa-layout-stacked';
+        btn.innerHTML = 'Dock to Side';
+        btn.style.background = '#059669';
+    }
 }
 
 function initTheme() {
@@ -220,10 +332,62 @@ function getTraceFrameState() {
     return { activeState: frame.node, activeTransition: frame.transition };
 }
 
+function createRowElement(id, canRemove) {
+    const div = document.createElement('div');
+    div.className = 'test-row';
+    div.setAttribute('data-row-id', id);
+    div.innerHTML = `
+        <div class="test-row-inner">
+            <input type="text" id="input-${id}" placeholder="Enter string (e.g., aababaa)…" class="test-row-input" autocomplete="off" />
+            <button type="button" id="action-validate-${id}" class="btn-validate">Validate</button>
+            <div class="test-row-actions">
+                <button type="button" id="clear-${id}" class="btn-remove-row" aria-label="Clear this case" title="Clear">↺</button>
+                ${canRemove ? `<button type="button" id="remove-${id}" class="btn-remove-row" aria-label="Remove test case" title="Remove">×</button>` : '<span></span>'}
+            </div>
+        </div>
+        <div class="result-cell">
+            <div id="badge-${id}"></div>
+            <div id="detail-${id}" class="result-detail"></div>
+        </div>
+    `;
+    div.querySelector(`#action-validate-${id}`).addEventListener('click', () => validateSingle(id));
+    div.querySelector(`#clear-${id}`).addEventListener('click', () => {
+        const input = document.getElementById(`input-${id}`);
+        if (input) input.value = '';
+        clearRowResult(id);
+    });
+    const removeBtn = div.querySelector(`#remove-${id}`);
+    if (removeBtn) removeBtn.addEventListener('click', () => removeTestRow(id));
+    div.querySelector(`#input-${id}`).addEventListener('keydown', e => {
+        if (e.key === 'Enter') validateSingle(id);
+    });
+    return div;
+}
+
 function addTestRow() {
     const id = nextRowId++;
     testRowIds.push(id);
-    renderTestRows();
+    const container = document.getElementById('matrix-rows');
+    // Update all existing remove buttons to show (now there are >1 rows)
+    if (testRowIds.length === 2) {
+        const firstId = testRowIds[0];
+        const firstRow = container.querySelector(`[data-row-id="${firstId}"]`);
+        if (firstRow) {
+            const existingSpan = firstRow.querySelector('span:last-child');
+            if (existingSpan) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.id = `remove-${firstId}`;
+                btn.className = 'btn-remove-row focus-ring';
+                btn.setAttribute('aria-label', 'Remove test case');
+                btn.textContent = '×';
+                btn.addEventListener('click', () => removeTestRow(firstId));
+                existingSpan.replaceWith(btn);
+            }
+        }
+    }
+    const canRemove = testRowIds.length > 1;
+    container.appendChild(createRowElement(id, canRemove));
     updateClearAllVisibility();
     const input = document.getElementById(`input-${id}`);
     if (input) input.focus();
@@ -237,7 +401,20 @@ function removeTestRow(id) {
         return;
     }
     testRowIds = testRowIds.filter(rid => rid !== id);
-    renderTestRows();
+    const row = document.querySelector(`[data-row-id="${id}"]`);
+    if (row) row.remove();
+    // If only 1 row left, hide its remove button
+    if (testRowIds.length === 1) {
+        const lastId = testRowIds[0];
+        const lastRow = document.querySelector(`[data-row-id="${lastId}"]`);
+        if (lastRow) {
+            const btn = lastRow.querySelector(`#remove-${lastId}`);
+            if (btn) {
+                const span = document.createElement('span');
+                btn.replaceWith(span);
+            }
+        }
+    }
     updateClearAllVisibility();
 }
 
@@ -246,27 +423,7 @@ function renderTestRows() {
     container.innerHTML = '';
     testRowIds.forEach(id => {
         const canRemove = testRowIds.length > 1;
-        container.innerHTML += `
-            <div class="test-row" data-row-id="${id}">
-                <input type="text" id="input-${id}" placeholder="Enter test string…" class="test-row-input focus-ring" autocomplete="off" />
-                <button type="button" id="action-validate-${id}" class="btn-validate focus-ring">Validate</button>
-                <div class="result-cell flex flex-col justify-center min-w-0">
-                    <div id="badge-${id}"></div>
-                    <div id="detail-${id}" class="result-detail"></motion>
-                </motion>
-                ${canRemove ? `<button type="button" id="remove-${id}" class="btn-remove-row focus-ring" aria-label="Remove test case">×</button>` : '<span></span>'}
-            </motion>
-        `;
-    });
-
-    testRowIds.forEach(id => {
-        document.getElementById(`action-validate-${id}`).addEventListener('click', () => validateSingle(id));
-        const removeBtn = document.getElementById(`remove-${id}`);
-        if (removeBtn) removeBtn.addEventListener('click', () => removeTestRow(id));
-        const input = document.getElementById(`input-${id}`);
-        input.addEventListener('keydown', e => {
-            if (e.key === 'Enter') validateSingle(id);
-        });
+        container.appendChild(createRowElement(id, canRemove));
     });
 }
 
@@ -282,11 +439,85 @@ function clearRowResult(id) {
     if (detail) detail.textContent = '';
 }
 
+function validateAllRows() {
+    // Run each row one at a time, waiting for trace animation to finish before next
+    const ids = [...testRowIds];
+    let i = 0;
+
+    function runNext() {
+        if (i >= ids.length) return;
+        const id = ids[i++];
+
+        // Run the simulation synchronously, show badge+detail, then play trace
+        const inputEl = document.getElementById(`input-${id}`);
+        const badge = document.getElementById(`badge-${id}`);
+        const detail = document.getElementById(`detail-${id}`);
+        const validateBtn = document.getElementById(`action-validate-${id}`);
+        const inputVal = inputEl ? inputEl.value.trim() : '';
+
+        if (!inputVal) {
+            runNext();
+            return;
+        }
+
+        if (validateBtn) validateBtn.disabled = true;
+        if (badge) badge.innerHTML = '<span class="result-badge"><span class="spinner"></span>Validating…</span>';
+        if (detail) detail.textContent = '';
+
+        setTimeout(() => {
+            const result = simulateDFA(inputVal);
+            if (validateBtn) validateBtn.disabled = false;
+
+            if (result.isAccepted) {
+                if (badge) badge.innerHTML = '<span class="result-badge result-badge-accepted">✓ Accepted</span>';
+                if (detail) detail.textContent = `Path: ${result.pathString}`;
+            } else {
+                if (badge) badge.innerHTML = '<span class="result-badge result-badge-rejected">✗ Rejected</span>';
+                if (detail) detail.textContent = result.invalidChar !== null
+                    ? `Invalid symbol '${result.invalidChar}'`
+                    : `Rejected at ${result.rejectAt || result.finalState}`;
+            }
+
+            // Load trace and play it, then move to next row when done
+            activeTrace.frames = result.animationFrames;
+            activeTrace.index = 0;
+            showTraceControls();
+            renderTraceStep();
+
+            if (currentTab === 'dfa') {
+                // Play animation, then after it completes kick off the next row
+                if (activeAnimationTimeout) clearInterval(activeAnimationTimeout);
+                activeTrace.playing = true;
+                updateTraceControlsUI();
+
+                activeAnimationTimeout = setInterval(() => {
+                    if (activeTrace.index >= activeTrace.frames.length - 1) {
+                        clearInterval(activeAnimationTimeout);
+                        activeAnimationTimeout = null;
+                        activeTrace.playing = false;
+                        updateTraceControlsUI();
+                        // Short pause between cases then go to next
+                        setTimeout(runNext, 400);
+                        return;
+                    }
+                    activeTrace.index++;
+                    renderTraceStep();
+                }, 600);
+            } else {
+                runNext();
+            }
+        }, 280);
+    }
+
+    runNext();
+}
+
 function clearAllTestRows() {
     if (activeAnimationTimeout) clearInterval(activeAnimationTimeout);
     stopTrace();
     testRowIds = [];
     nextRowId = 0;
+    document.getElementById('matrix-rows').innerHTML = '';
     addTestRow();
     renderSVGGraph();
 }
@@ -584,6 +815,22 @@ function getStateTransitionTooltip(data, nodeId) {
 }
 
 function onGraphMouseMove(e) {
+    if (isDraggingGraph) {
+        const container = document.getElementById('canvas-container');
+        const effectiveViewBox = getEffectiveViewBox();
+        const ratio = effectiveViewBox.w / container.clientWidth;
+
+        const dx = (e.clientX - dragStartX) * ratio;
+        const dy = (e.clientY - dragStartY) * ratio;
+
+        graphViewBox.x = startViewBoxX - dx;
+        graphViewBox.y = startViewBoxY - dy;
+
+        renderSVGGraph(getTraceFrameState());
+        hideGraphTooltip();
+        return;
+    }
+
     const target = e.target.closest('[data-tooltip]');
     const tooltip = document.getElementById('graph-tooltip');
     const panel = document.querySelector('.graph-panel');
@@ -774,6 +1021,9 @@ function validateSingle(rowId) {
                 detail.textContent = `Rejected at ${stateLabel}`;
             }
         }
+
+        // Log to sidebar history
+        addHistoryEntry(inputVal, result.isAccepted, result.animationFrames);
 
         activeTrace.frames = result.animationFrames;
         activeTrace.index = 0;

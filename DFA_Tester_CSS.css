@@ -9,11 +9,11 @@
     --app-panel-bg: #ffffff;
     --app-sidebar-bg: #ffffff;
     --app-sidebar-switcher: #f8fafc;
-    --app-logo: #4f46e5;
-    --app-logo-shadow: rgba(79, 70, 229, 0.25);
-    --app-accent: #4f46e5;
-    --app-accent-soft: #eef2ff;
-    --app-accent-text: #4338ca;
+    --app-logo: #2563eb;
+    --app-logo-shadow: rgba(37, 99, 235, 0.25);
+    --app-accent: #2563eb;
+    --app-accent-soft: #eff6ff;
+    --app-accent-text: #1d4ed8;
     --graph-bg: #f1f5f9;
     --graph-panel-border: #e2e8f0;
     --graph-node-fill: #ffffff;
@@ -34,7 +34,7 @@
     --table-head-text: #64748b;
     --table-body-text: #334155;
     --trace-controls-bg: #f8fafc;
-    --spinner-color: #6366f1;
+    --spinner-color: #3b82f6;
 }
 
 [data-theme="dark"] {
@@ -46,11 +46,11 @@
     --app-panel-bg: #1e293b;
     --app-sidebar-bg: #1e293b;
     --app-sidebar-switcher: #0f172a;
-    --app-logo: #6366f1;
-    --app-logo-shadow: rgba(99, 102, 241, 0.35);
-    --app-accent: #818cf8;
-    --app-accent-soft: #312e81;
-    --app-accent-text: #c7d2fe;
+    --app-logo: #3b82f6;
+    --app-logo-shadow: rgba(59, 130, 246, 0.35);
+    --app-accent: #60a5fa;
+    --app-accent-soft: #1e3a8a;
+    --app-accent-text: #bfdbfe;
     --graph-bg: #0f172a;
     --graph-panel-border: #334155;
     --graph-node-fill: #1e293b;
@@ -71,7 +71,7 @@
     --table-head-text: #94a3b8;
     --table-body-text: #e2e8f0;
     --trace-controls-bg: #0f172a;
-    --spinner-color: #a5b4fc;
+    --spinner-color: #93c5fd;
 }
 
 body,
@@ -83,6 +83,17 @@ body,
 
 code, pre {
     font-family: 'Fira Code', monospace;
+}
+
+.app-body {
+    background: var(--app-bg);
+    color: var(--app-text);
+    border-bottom: 1px solid var(--app-border);
+    /* Subtle Grid Background */
+    background-size: 40px 40px;
+    background-image: 
+        linear-gradient(to right, rgba(100, 116, 139, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(100, 116, 139, 0.05) 1px, transparent 1px);
 }
 
 .app-header {
@@ -326,14 +337,27 @@ code, pre {
     background: var(--app-sidebar-switcher);
 }
 
-/* Sequence tester rows */
+/* Sequence tester rows — modern pill input style */
 .test-row {
-    display: grid;
-    grid-template-columns: 1fr auto auto auto;
-    gap: 0.5rem;
-    align-items: center;
-    padding: 0.35rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
     animation: rowIn 180ms ease;
+}
+
+.test-row-inner {
+    display: flex;
+    align-items: center;
+    border: 2px solid var(--app-border);
+    border-radius: 0.875rem;
+    overflow: hidden;
+    background: var(--app-panel-bg);
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.test-row-inner:focus-within {
+    border-color: var(--app-accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 @keyframes rowIn {
@@ -344,35 +368,42 @@ code, pre {
 .test-row-input {
     font-family: 'Fira Code', monospace;
     font-size: 0.875rem;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--app-border);
-    border-radius: 0.75rem;
-    background: var(--app-sidebar-switcher);
+    padding: 0.65rem 1rem;
+    border: none;
+    background: transparent;
     color: var(--app-text);
-    transition: border-color 150ms ease, box-shadow 150ms ease;
+    flex: 1;
+    min-width: 0;
+}
+
+.test-row-input::placeholder {
+    color: var(--app-muted);
+    font-style: italic;
 }
 
 .test-row-input:focus {
     outline: none;
-    border-color: var(--app-accent);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
 
 .btn-validate {
-    padding: 0.5rem 1rem;
-    border-radius: 0.75rem;
-    font-size: 0.8rem;
-    font-weight: 600;
+    padding: 0.55rem 1.1rem;
+    border-radius: 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
     background: var(--app-accent);
     color: #fff;
     border: none;
+    border-left: 2px solid var(--app-accent);
     cursor: pointer;
     white-space: nowrap;
-    transition: background 150ms ease, transform 100ms ease;
+    transition: filter 150ms ease;
+    flex-shrink: 0;
 }
 
 .btn-validate:hover {
-    filter: brightness(1.08);
+    filter: brightness(1.1);
 }
 
 .btn-validate:disabled {
@@ -380,16 +411,27 @@ code, pre {
     cursor: wait;
 }
 
+.test-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0 0.25rem;
+    border-left: 1px solid var(--app-border);
+}
+
 .btn-remove-row {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 0.5rem;
-    border: 1px solid var(--app-border);
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 0.45rem;
+    border: 1px solid transparent;
     background: transparent;
     color: var(--app-muted);
-    font-size: 1.1rem;
+    font-size: 1rem;
     line-height: 1;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
 }
 
@@ -399,13 +441,17 @@ code, pre {
     background: rgba(244, 63, 94, 0.08);
 }
 
+.result-cell {
+    padding: 0 0.25rem 0.1rem;
+}
+
 .result-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    padding: 0.25rem 0.6rem;
+    padding: 0.2rem 0.55rem;
     border-radius: 9999px;
     white-space: nowrap;
     animation: badgeIn 180ms ease;
@@ -417,15 +463,57 @@ code, pre {
 }
 
 .result-badge-accepted {
-    background: rgba(16, 185, 129, 0.15);
+    background: rgba(16, 185, 129, 0.12);
     color: #059669;
-    border: 1px solid rgba(16, 185, 129, 0.35);
+    border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .result-badge-rejected {
-    background: rgba(244, 63, 94, 0.12);
+    background: rgba(244, 63, 94, 0.1);
     color: #e11d48;
-    border: 1px solid rgba(244, 63, 94, 0.35);
+    border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+/* Test History panel in sidebar */
+.history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.85rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--app-border);
+    background: var(--app-sidebar-switcher);
+    animation: rowIn 200ms ease;
+    gap: 0.5rem;
+}
+
+.history-string {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--app-text);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.history-badge-accepted {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #059669;
+    flex-shrink: 0;
+}
+
+.history-badge-rejected {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #e11d48;
+    flex-shrink: 0;
 }
 
 [data-theme="dark"] .result-badge-accepted {
@@ -523,5 +611,51 @@ svg text.graph-label {
 
     .test-row {
         grid-template-columns: minmax(0, 1fr) auto minmax(120px, 1.4fr) auto;
+    }
+}
+
+/* DFA Layout modes */
+.dfa-layout-stacked {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.dfa-layout-docked {
+    display: grid;
+    grid-template-columns: 1fr minmax(300px, 380px);
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.dfa-layout-docked #dfa-tester-card {
+    max-height: 80vh;
+    overflow-y: auto;
+    position: sticky;
+    top: 1rem;
+}
+
+.dfa-layout-docked #dfa-tester-card .test-row {
+    grid-template-columns: 1fr auto auto;
+    gap: 0.35rem;
+}
+
+.dfa-layout-docked #dfa-tester-card .result-cell {
+    grid-column: 1 / -1;
+}
+
+.dfa-layout-docked #dfa-tester-card .test-row-input {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+}
+
+.dfa-layout-docked #dfa-tester-card .btn-validate {
+    font-size: 0.7rem;
+    padding: 0.35rem 0.6rem;
+}
+
+@media (max-width: 1023px) {
+    .dfa-layout-docked {
+        grid-template-columns: 1fr;
     }
 }
