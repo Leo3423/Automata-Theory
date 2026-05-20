@@ -632,6 +632,10 @@ svg text.graph-label {
     align-items: start;
 }
 
+.dfa-layout-docked #dfa-graph-card {
+    min-width: 0;
+}
+
 .dfa-layout-docked #dfa-tester-card {
     max-height: 80vh;
     overflow-y: auto;
@@ -676,7 +680,7 @@ svg text.graph-label {
     font-size: 0.85rem;
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1199px) {
     .dfa-layout-docked {
         grid-template-columns: 1fr;
     }
