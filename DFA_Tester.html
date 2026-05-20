@@ -8,74 +8,97 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="DFA_Tester_CSS.css">
 </head>
-<body class="app-body min-h-screen flex flex-col">
+<body class="app-body min-h-screen flex flex-col lg:flex-row transition-ui">
 
-    <header class="app-header sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4 flex-wrap">
-            <div class="flex items-center space-x-3 min-w-0">
-                <div class="app-logo-badge text-white p-2 rounded-xl font-bold shadow-md">
-                    ∑
-                </div>
-                <div>
-                    <span class="text-lg font-bold tracking-tight app-title">AutomataLab</span>
-                    <span class="text-xs block font-medium -mt-1 app-subtitle">Interactive Tracing System</span>
-                </div>
+    <!-- Premium Sidebar Layout -->
+    <aside class="w-full lg:w-80 sidebar-card border-b lg:border-b-0 lg:border-r app-border flex flex-col shrink-0 transition-ui">
+        <!-- Logo Section -->
+        <div class="p-5 border-b app-border flex items-center space-x-3 shrink-0">
+            <img src="logo_atmt.png" alt="AutomataLab Logo" class="h-6 w-auto object-contain">
+            <div class="h-6 w-[1px] bg-slate-200 dark:bg-slate-800"></div>
+            <span class="text-[11px] font-semibold tracking-wide uppercase text-slate-400 dark:text-slate-500 leading-none">Interactive Tracing System</span>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <div class="p-5 flex-1 flex flex-col overflow-y-auto gap-5">
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-widest app-muted">Component View</p>
+                <p class="text-[12px] font-medium text-slate-400 dark:text-slate-500 mt-0.5 mb-3">Automata Engines</p>
+                <nav class="space-y-1" role="tablist" aria-label="Automaton component views">
+                    <button id="tab-dfa" type="button" role="tab" aria-selected="true" class="tab-btn tab-btn-active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-ui focus-ring text-left">
+                        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="7" cy="12" r="3" />
+                            <circle cx="17" cy="12" r="3" />
+                            <path d="M10 12h4" />
+                            <path d="M7 6c0-2 2-3 5-3s5 1 5 3" />
+                        </svg>
+                        <span class="tab-label">Deterministic Finite Automata (DFA)</span>
+                    </button>
+                    <button id="tab-cfg" type="button" role="tab" aria-selected="false" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-ui focus-ring text-left">
+                        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="6" height="6" rx="1" />
+                            <rect x="15" y="15" width="6" height="6" rx="1" />
+                            <path d="M9 6h6v9" />
+                        </svg>
+                        <span class="tab-label">Context-Free Grammar (CFG)</span>
+                    </button>
+                    <button id="tab-pda" type="button" role="tab" aria-selected="false" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-ui focus-ring text-left">
+                        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                            <path d="M2 17l10 5 10-5" />
+                            <path d="M2 12l10 5 10-5" />
+                        </svg>
+                        <span class="tab-label">Pushdown Automata (PDA)</span>
+                    </button>
+                </nav>
             </div>
 
-            <div class="flex items-center gap-3 flex-wrap justify-end">
-                <div class="flex items-center gap-2 alphabet-control" aria-label="Switch alphabet preset">
-                    <span class="text-xs font-semibold uppercase tracking-wide app-muted hidden sm:inline">Alphabet</span>
-                    <div class="alphabet-segmented flex p-0.5 rounded-xl" role="group" aria-label="Alphabet selection">
-                        <button id="btn-ab" type="button" class="alphabet-btn alphabet-btn-active px-3 py-1.5 rounded-lg text-sm font-semibold transition-ui" title="Switch to alphabet {a, b}">a, b</button>
-                        <button id="btn-01" type="button" class="alphabet-btn px-3 py-1.5 rounded-lg text-sm font-semibold transition-ui" title="Switch to alphabet {0, 1}">0, 1</button>
+            <!-- Active Definition Card -->
+            <div class="bg-[#111827] dark:bg-slate-950 text-white rounded-2xl p-5 shadow-lg space-y-4 border border-slate-800 shrink-0">
+                <h4 class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Active Definition</h4>
+                <div id="sidebar-meta" class="space-y-4"></div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Panel -->
+    <div class="flex-1 flex flex-col min-w-0 min-h-screen">
+        <!-- Top bar controls -->
+        <header class="app-header h-16 border-b app-border px-6 flex items-center justify-end shrink-0 transition-ui">
+            <div class="flex items-center gap-6">
+                <div class="flex items-center alphabet-control" aria-label="Switch alphabet preset">
+                    <div class="alphabet-segmented flex p-1 rounded-[1rem] border app-border" role="group" aria-label="Alphabet selection">
+                        <button id="btn-ab" type="button" class="alphabet-btn alphabet-btn-active px-4 py-1.5 rounded-[0.75rem] text-sm font-bold transition-ui" title="Switch to alphabet {a, b}">Regex {a, b}</button>
+                        <button id="btn-01" type="button" class="alphabet-btn px-4 py-1.5 rounded-[0.75rem] text-sm font-bold transition-ui" title="Switch to alphabet {0, 1}">Regex {0, 1}</button>
                     </div>
                 </div>
 
-                <button id="btn-theme-toggle" type="button" class="theme-toggle-btn flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-ui focus-ring" aria-label="Toggle light and dark theme" title="Toggle theme">
+                <button id="btn-theme-toggle" type="button" class="theme-toggle-btn flex items-center gap-2 px-4 py-2 rounded-[1rem] text-sm font-bold transition-ui focus-ring border app-border" aria-label="Toggle light and dark theme" title="Toggle theme">
                     <span id="theme-icon-light" class="theme-icon" aria-hidden="true">☀</span>
                     <span id="theme-icon-dark" class="theme-icon hidden" aria-hidden="true">☾</span>
                     <span class="hidden sm:inline" id="theme-label">Dark</span>
                 </button>
             </div>
-        </div>
-    </header>
+        </header>
 
-    <div class="app-layout max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex-1 py-6 lg:py-8 w-full grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 min-w-0">
+        <!-- Main View Area (Scrollable) -->
+        <main class="flex-1 p-6 lg:p-8 overflow-y-auto space-y-6 max-w-5xl w-full mx-auto">
 
-        <aside class="lg:col-span-1 min-w-0">
-            <div class="sidebar-card rounded-2xl border overflow-hidden transition-ui">
-                <div class="sidebar-switcher p-3 border-b">
-                    <p class="text-xs font-bold uppercase tracking-wider px-2 mb-2 app-muted">Component View</p>
-                    <nav class="space-y-1" role="tablist" aria-label="Automaton component views">
-                        <button id="tab-dfa" type="button" role="tab" aria-selected="true" class="tab-btn tab-btn-active w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-ui focus-ring">
-                            <span class="tab-label">DFA</span>
-                            <span class="tab-desc block text-xs mt-0.5 font-normal">Finite-state acceptor for regular languages</span>
-                        </button>
-                        <button id="tab-cfg" type="button" role="tab" aria-selected="false" class="tab-btn w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-ui focus-ring">
-                            <span class="tab-label">CFG</span>
-                            <span class="tab-desc block text-xs mt-0.5 font-normal">Rewrite rules for context-free languages</span>
-                        </button>
-                        <button id="tab-pda" type="button" role="tab" aria-selected="false" class="tab-btn w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-ui focus-ring">
-                            <span class="tab-label">PDA</span>
-                            <span class="tab-desc block text-xs mt-0.5 font-normal">Stack machine for context-free recognition</span>
-                        </button>
-                    </nav>
+            <!-- Regular Expression Card -->
+            <div class="panel-card rounded-2xl border p-6 shadow-sm transition-ui flex flex-col gap-3">
+                <div class="self-start">
+                    <span class="regex-badge text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-md">Regular Expression Rule Set</span>
                 </div>
-
-                <div class="sidebar-definition p-4">
-                    <h4 class="text-xs font-bold uppercase tracking-wider mb-3 app-muted">Active Definition</h4>
-                    <div id="sidebar-meta" class="space-y-3 text-sm"></div>
+                <div class="flex items-stretch gap-4">
+                    <div id="regex-display" class="flex-1 bg-[var(--app-sidebar-switcher)] border app-border rounded-xl p-5 text-lg font-bold font-mono break-all leading-relaxed flex items-center min-h-[5rem]"></div>
+                    <button type="button" id="btn-regex-format" class="bg-[var(--app-sidebar-switcher)] text-[var(--app-text)] border app-border w-20 rounded-xl shadow-sm flex flex-col items-center justify-center shrink-0 transition-ui hover:bg-slate-200 dark:hover:bg-slate-700 font-bold active:scale-95" aria-label="Toggle Regex Format" title="Toggle Union Operator (+ or |)">
+                        <span class="text-[9px] uppercase tracking-wider app-muted">Format</span>
+                        <span id="regex-format-label" class="text-lg leading-none mt-1">USE |</span>
+                    </button>
                 </div>
             </div>
-        </aside>
 
-        <main class="lg:col-span-3 space-y-6 min-w-0">
-
-            <div class="panel-card rounded-2xl border p-6 shadow-sm transition-ui">
-                <span class="regex-badge text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-md">Regular Expression Rule Set</span>
-                <div id="regex-display" class="mt-3 text-md font-mono font-semibold break-all leading-relaxed"></div>
-            </div>
-
+            <!-- DFA view panel -->
             <div id="view-dfa" class="view-panel space-y-6 transition-ui">
                 <div class="panel-card rounded-2xl border p-6 shadow-sm flex flex-col transition-ui">
                     <div class="mb-4">
@@ -89,16 +112,25 @@
                         </div>
 
                         <div class="graph-legend" aria-label="Graph legend">
-                            <div class="legend-item">
-                                <svg class="legend-icon" width="28" height="20" aria-hidden="true"><line x1="2" y1="10" x2="18" y2="10" stroke="currentColor" stroke-width="1.5"/><polygon points="18,6 26,10 18,14" fill="currentColor"/><circle cx="8" cy="10" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+                            <div class="legend-item" style="gap: 0.5rem">
+                                <svg class="legend-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                                    <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                                    <text x="10" y="14" font-size="12" font-weight="bold" text-anchor="middle" fill="currentColor" font-family="sans-serif">−</text>
+                                </svg>
                                 <span>Start</span>
                             </div>
-                            <div class="legend-item">
-                                <svg class="legend-icon" width="28" height="20" aria-hidden="true"><circle cx="14" cy="10" r="6" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="14" cy="10" r="4" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+                            <div class="legend-item" style="gap: 0.5rem">
+                                <svg class="legend-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                                    <circle cx="10" cy="10" r="8" fill="none" stroke="#10b981" stroke-width="1.5"/>
+                                    <text x="10" y="14" font-size="12" font-weight="bold" text-anchor="middle" fill="#10b981" font-family="sans-serif">+</text>
+                                </svg>
                                 <span>Accept</span>
                             </div>
-                            <div class="legend-item">
-                                <svg class="legend-icon" width="28" height="20" aria-hidden="true"><circle cx="14" cy="10" r="6" fill="#f43f5e" stroke="#fb7185" stroke-width="1.5"/><text x="14" y="13" text-anchor="middle" fill="white" font-size="8" font-weight="bold">T</text></svg>
+                            <div class="legend-item" style="gap: 0.5rem">
+                                <svg class="legend-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                                    <circle cx="10" cy="10" r="8" fill="#f43f5e" stroke="#fb7185" stroke-width="1.5"/>
+                                    <text x="10" y="13.5" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="monospace">T</text>
+                                </svg>
                                 <span>Trap</span>
                             </div>
                         </div>
@@ -144,6 +176,7 @@
                 </div>
             </div>
 
+            <!-- CFG view panel -->
             <div id="view-cfg" class="view-panel hidden transition-ui">
                 <div id="cfg-empty" class="empty-state panel-card rounded-2xl border p-10 text-center hidden transition-ui">
                     <div class="empty-state-icon text-4xl mb-3" aria-hidden="true">📝</div>
@@ -156,6 +189,7 @@
                 </div>
             </div>
 
+            <!-- PDA view panel -->
             <div id="view-pda" class="view-panel hidden space-y-6 transition-ui">
                 <div id="pda-empty" class="empty-state panel-card rounded-2xl border p-10 text-center hidden transition-ui">
                     <div class="empty-state-icon text-4xl mb-3" aria-hidden="true">📚</div>

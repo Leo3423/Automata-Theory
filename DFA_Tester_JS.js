@@ -139,6 +139,7 @@ const automataData = {
 let currentAlphabet = 'ab';
 let currentTab = 'dfa';
 let activeAnimationTimeout = null;
+let regexFormat = '+'; // can be '+' or '|'
 let testRowIds = [];
 let nextRowId = 0;
 
@@ -176,6 +177,15 @@ function bindGlobalEvents() {
     document.getElementById('btn-trace-prev').addEventListener('click', () => stepTrace(-1));
     document.getElementById('btn-trace-next').addEventListener('click', () => stepTrace(1));
     document.getElementById('btn-trace-play').addEventListener('click', playTraceAnimation);
+
+    const btnRegexFormat = document.getElementById('btn-regex-format');
+    if (btnRegexFormat) {
+        btnRegexFormat.addEventListener('click', () => {
+            regexFormat = regexFormat === '+' ? '|' : '+';
+            document.getElementById('regex-format-label').textContent = regexFormat === '+' ? 'USE |' : 'USE +';
+            updateWorkspace();
+        });
+    }
 
     const canvasContainer = document.getElementById('canvas-container');
     canvasContainer.addEventListener('mousemove', onGraphMouseMove);
@@ -316,12 +326,25 @@ function switchTab(tabName) {
 
 function updateWorkspace() {
     const data = automataData[currentAlphabet];
-    document.getElementById('regex-display').innerText = data.regex;
+    let displayRegex = data.regex;
+    if (regexFormat === '|') {
+        displayRegex = displayRegex.replace(/\+/g, '|');
+    }
+    document.getElementById('regex-display').innerText = displayRegex;
     document.getElementById('sidebar-meta').innerHTML = `
-        <div><span class="app-muted block text-xs">Start State</span><span class="font-mono font-bold">${data.startState}</span></motion>
-        <div><span class="app-muted block text-xs">Accepting Set</span><span class="font-mono font-bold" style="color: var(--cfg-code-text)">${data.acceptStates.join(', ')}</span></motion>
-        <div><span class="app-muted block text-xs">Alphabet</span><span class="font-mono font-bold">{ ${data.alphabet.join(', ')} }</span></motion>
-    `.replace(/<\/motion>/g, '</motion>').replace(/<\/motion>/g, '</div>');
+        <div>
+            <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Start State</span>
+            <span class="font-mono text-lg font-bold text-white">${data.startState}</span>
+        </div>
+        <div>
+            <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Accepting Set</span>
+            <span class="font-mono text-lg font-bold text-emerald-400">${data.acceptStates.join(' ')}</span>
+        </div>
+        <div>
+            <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Alphabet Rules Set</span>
+            <span class="font-mono text-lg font-bold text-white">{ ${data.alphabet.join(', ')} }</span>
+        </div>
+    `;
 
     const hasCfg = !!(data.cfg && data.cfg.trim());
     document.getElementById('cfg-empty').classList.toggle('hidden', hasCfg);
@@ -512,34 +535,37 @@ function renderSVGGraph({ activeState = null, activeTransition = null } = {}) {
 
         const tooltipLines = getStateTransitionTooltip(data, nodeId);
 
-        if (isStart) {
-            const ax = node.x - nodeRadius - 28;
-            const ay = node.y;
-            svgHtml += `
-                <line x1="${ax}" y1="${ay}" x2="${node.x - nodeRadius - 2}" y2="${ay}" stroke="${isActiveNode ? TRACE_HIGHLIGHT.stroke : theme.startLabel}" stroke-width="1.5" marker-end="url(#arrow)" />
-            `;
-        }
-
+        // We remove the start arrow line entirely, as the start state is just a circle with a negative sign inside.
         svgHtml += `
             <g class="graph-node-group" data-node="${nodeId}" data-tooltip="${escapeHtmlAttr(tooltipLines)}">
                 <circle class="graph-node-hit" cx="${node.x}" cy="${node.y}" r="${nodeRadius + 4}" fill="transparent" stroke="none" />
                 <circle cx="${node.x}" cy="${node.y}" r="${nodeRadius}" fill="${fillStyle}" stroke="${strokeStyle}" stroke-width="${isActiveNode ? 3 : 2}" />
         `;
 
-        if (isAccept) {
-            svgHtml += `<circle cx="${node.x}" cy="${node.y}" r="16" fill="none" stroke="${strokeStyle}" stroke-width="1.2" />`;
-        }
-
         const label = isTrap ? 'T' : nodeId;
-        const labelY = isAccept ? node.y + 5 : node.y + 4;
-        svgHtml += `
-                <text class="graph-label" x="${node.x}" y="${labelY}" fill="${textColor}" font-size="11" font-weight="bold" text-anchor="middle" font-family="monospace">${label}</text>
-            </g>
-        `;
 
-        if (isStart) {
-            svgHtml += `<text class="graph-label" x="${node.x}" y="${node.y - 24}" fill="${isActiveNode ? TRACE_HIGHLIGHT.edge : theme.startLabel}" font-size="9" font-weight="bold" text-anchor="middle">START</text>`;
+        if (isStart && isAccept) {
+            svgHtml += `
+                <text class="graph-label" x="${node.x}" y="${node.y - 3}" fill="#10b981" font-size="14" font-weight="bold" text-anchor="middle" font-family="sans-serif">±</text>
+                <text class="graph-label" x="${node.x}" y="${node.y + 9}" fill="${textColor}" font-size="10" font-weight="bold" text-anchor="middle" font-family="monospace">${label}</text>
+            `;
+        } else if (isStart) {
+            svgHtml += `
+                <text class="graph-label" x="${node.x}" y="${node.y - 3}" fill="${textColor}" font-size="15" font-weight="bold" text-anchor="middle" font-family="sans-serif">−</text>
+                <text class="graph-label" x="${node.x}" y="${node.y + 9}" fill="${textColor}" font-size="10" font-weight="bold" text-anchor="middle" font-family="monospace">${label}</text>
+            `;
+        } else if (isAccept) {
+            svgHtml += `
+                <text class="graph-label" x="${node.x}" y="${node.y - 3}" fill="#10b981" font-size="14" font-weight="bold" text-anchor="middle" font-family="sans-serif">+</text>
+                <text class="graph-label" x="${node.x}" y="${node.y + 9}" fill="${textColor}" font-size="10" font-weight="bold" text-anchor="middle" font-family="monospace">${label}</text>
+            `;
+        } else {
+            svgHtml += `
+                <text class="graph-label" x="${node.x}" y="${node.y + 4}" fill="${textColor}" font-size="11" font-weight="bold" text-anchor="middle" font-family="monospace">${label}</text>
+            `;
         }
+
+        svgHtml += `</g>`;
     });
 
     svgHtml += `</svg>`;
