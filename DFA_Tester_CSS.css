@@ -353,6 +353,8 @@ code, pre {
     overflow: hidden;
     background: var(--app-panel-bg);
     transition: border-color 150ms ease, box-shadow 150ms ease;
+    min-width: 0;
+    width: 100%;
 }
 
 .test-row-inner:focus-within {
@@ -625,7 +627,7 @@ svg text.graph-label {
 
 .dfa-layout-docked {
     display: grid;
-    grid-template-columns: 1fr minmax(300px, 380px);
+    grid-template-columns: 1fr minmax(280px, 380px);
     gap: 1.5rem;
     align-items: start;
 }
@@ -633,17 +635,24 @@ svg text.graph-label {
 .dfa-layout-docked #dfa-tester-card {
     max-height: 80vh;
     overflow-y: auto;
+    overflow-x: hidden;
     position: sticky;
     top: 1rem;
+    min-width: 0;
+}
+
+.dfa-layout-docked #dfa-tester-card > div:first-child {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
 }
 
 .dfa-layout-docked #dfa-tester-card .test-row {
-    grid-template-columns: minmax(0, 1fr) auto auto;
-    gap: 0.35rem;
+    min-width: 0;
 }
 
 .dfa-layout-docked #dfa-tester-card .result-cell {
-    grid-column: 1 / -1;
+    min-width: 0;
 }
 
 .dfa-layout-docked #dfa-tester-card .test-row-input {
@@ -654,6 +663,17 @@ svg text.graph-label {
 .dfa-layout-docked #dfa-tester-card .btn-validate {
     font-size: 0.7rem;
     padding: 0.35rem 0.6rem;
+}
+
+.dfa-layout-docked #dfa-tester-card .test-row-actions {
+    gap: 0.2rem;
+    padding: 0 0.15rem;
+}
+
+.dfa-layout-docked #dfa-tester-card .btn-remove-row {
+    width: 1.6rem;
+    height: 1.6rem;
+    font-size: 0.85rem;
 }
 
 @media (max-width: 1023px) {
