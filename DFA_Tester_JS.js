@@ -18,12 +18,11 @@ const automataData = {
             'S9': { 'a': 'S10', 'b': 'S9' },
             'S10': { 'a': 'S8', 'b': 'S9' }
         },
-        // Refactored Coordinate Map for maximum readability on Alphabet {a, b}
         nodes: {
             'S0':  { x: 60,  y: 200 },
             'S1':  { x: 180, y: 90  },
             'S2':  { x: 180, y: 310 },
-            'T':   { x: 300, y: 200 }, // Placed centered near front to visually anchor traps
+            'T':   { x: 300, y: 200 },
             'S3':  { x: 420, y: 200 },
             'S4':  { x: 540, y: 90  },
             'S5':  { x: 540, y: 310 },
@@ -34,34 +33,104 @@ const automataData = {
             'S10': { x: 880, y: 200 }
         },
         cfg: `S  → A B C D\nA  → aa | bb\nB  → aB | bB | ε\nC  → a | b | ab | ba\nD  → aD | bD | aaD | bbD | ε`,
+        
         pda: [
-            { curr: 'q0', input: 'a', pop: 'Z0', next: 'q1', push: 'aZ0' },
-            { curr: 'q1', input: 'a', pop: 'a', next: 'q2', push: 'ε' },
-            { curr: 'q2', input: 'b', pop: 'Z0', next: 'q2', push: 'Z0' }
+            { curr: 'Start', input: 'Δ', pop: 'Z0', next: 'S0', push: 'Z0' },
+            { curr: 'S0', input: 'a', pop: 'Z0', next: 'S1', push: 'Z0' },
+            { curr: 'S0', input: 'b', pop: 'Z0', next: 'S2', push: 'Z0' },
+            { curr: 'S1', input: 'a', pop: 'Z0', next: 'S3', push: 'Z0' },
+            { curr: 'S1', input: 'b', pop: 'Z0', next: 'T', push: 'Z0' },
+            { curr: 'S2', input: 'a', pop: 'Z0', next: 'T', push: 'Z0' },
+            { curr: 'S2', input: 'b', pop: 'Z0', next: 'S3', push: 'Z0' },
+            { curr: 'S3', input: 'a', pop: 'Z0', next: 'S4', push: 'Z0' },
+            { curr: 'S3', input: 'b', pop: 'Z0', next: 'S5', push: 'Z0' },
+            { curr: 'T', input: 'a,b', pop: 'Z0', next: 'T', push: 'Z0' },
+            { curr: 'S4', input: 'a', pop: 'Z0', next: 'S6', push: 'Z0' },
+            { curr: 'S4', input: 'b', pop: 'Z0', next: 'S7', push: 'Z0' },
+            { curr: 'S5', input: 'a', pop: 'Z0', next: 'S6', push: 'Z0' },
+            { curr: 'S5', input: 'b', pop: 'Z0', next: 'S7', push: 'Z0' },
+            { curr: 'S6', input: 'a', pop: 'Z0', next: 'S8', push: 'Z0' },
+            { curr: 'S6', input: 'b', pop: 'Z0', next: 'S9', push: 'Z0' },
+            { curr: 'S7', input: 'a', pop: 'Z0', next: 'S10', push: 'Z0' },
+            { curr: 'S7', input: 'b', pop: 'Z0', next: 'S9', push: 'Z0' },
+            { curr: 'S8', input: 'a', pop: 'Z0', next: 'S8', push: 'Z0' },
+            { curr: 'S8', input: 'b', pop: 'Z0', next: 'S9', push: 'Z0' },
+            { curr: 'S9', input: 'a', pop: 'Z0', next: 'S10', push: 'Z0' },
+            { curr: 'S9', input: 'b', pop: 'Z0', next: 'S9', push: 'Z0' },
+            { curr: 'S10', input: 'a', pop: 'Z0', next: 'S8', push: 'Z0' },
+            { curr: 'S10', input: 'b', pop: 'Z0', next: 'S9', push: 'Z0' },
+            { curr: 'S8', input: 'Δ', pop: 'Z0', next: 'Accept', push: 'Z0' },
+            { curr: 'S9', input: 'Δ', pop: 'Z0', next: 'Accept', push: 'Z0' },
+            { curr: 'S10', input: 'Δ', pop: 'Z0', next: 'Accept', push: 'Z0' },
+            { curr: 'S9', input: 'empty', pop: 'Z0', next: 'Reject', push: 'Z0' }
         ],
         pdaBlocks: [
-            { id: 'b_start', type: 'rect', label: 'Start', x: 200, y: 30, w: 90, h: 40 },
-            { id: 'b_read1', type: 'diamond', label: 'Read', x: 200, y: 130, w: 100, h: 60 },
-            { id: 'b_push1', type: 'rect', label: 'Push X', x: 40, y: 140, w: 90, h: 40 },
-            { id: 'b_pop1',  type: 'diamond', label: 'Pop', x: 200, y: 260, w: 100, h: 60 },
-            { id: 'b_read2', type: 'diamond', label: 'Read', x: 420, y: 260, w: 100, h: 60 },
-            { id: 'b_pop2',  type: 'diamond', label: 'Pop', x: 640, y: 130, w: 100, h: 60 },
-            { id: 'b_accept', type: 'rect', label: 'Accept', x: 645, y: 30, w: 90, h: 40 },
-            { id: 'b_reject', type: 'rect', label: 'Reject', x: 425, y: 410, w: 90, h: 40 }
+            { id: 'Start_rect', type: 'rect', label: 'Start', x: 400, y: 15, w: 70, h: 25 },
+            { id: 'Push_rect', type: 'rect', label: 'Push', x: 50, y: 15, w: 70, h: 25 },
+            { id: 'S0', type: 'diamond', label: 'S0', x: 400, y: 80, w: 60, h: 40 },
+            { id: 'S1', type: 'diamond', label: 'S1', x: 260, y: 150, w: 60, h: 40 },
+            { id: 'S2', type: 'diamond', label: 'S2', x: 540, y: 150, w: 60, h: 40 },
+            { id: 'S3_L', type: 'diamond', label: 'S3', x: 180, y: 220, w: 50, h: 40 },
+            { id: 'T_L', type: 'diamond', label: 'T', x: 320, y: 220, w: 50, h: 40 },
+            { id: 'T_R', type: 'diamond', label: 'T', x: 480, y: 220, w: 50, h: 40 },
+            { id: 'S3_R', type: 'diamond', label: 'S3', x: 620, y: 220, w: 50, h: 40 },
+            { id: 'S4_L', type: 'diamond', label: 'S4', x: 120, y: 290, w: 50, h: 40 },
+            { id: 'S5_L', type: 'diamond', label: 'S5', x: 220, y: 290, w: 50, h: 40 },
+            { id: 'S4_R', type: 'diamond', label: 'S4', x: 580, y: 290, w: 50, h: 40 },
+            { id: 'S5_R', type: 'diamond', label: 'S5', x: 680, y: 290, w: 50, h: 40 },
+            { id: 'S6_L1', type: 'diamond', label: 'S6', x: 70, y: 360, w: 40, h: 40 },
+            { id: 'S7_L1', type: 'diamond', label: 'S7', x: 140, y: 360, w: 40, h: 40 },
+            { id: 'S6_L2', type: 'diamond', label: 'S6', x: 200, y: 360, w: 40, h: 40 },
+            { id: 'S7_L2', type: 'diamond', label: 'S7', x: 270, y: 360, w: 40, h: 40 },
+            { id: 'S6_R1', type: 'diamond', label: 'S6', x: 530, y: 360, w: 40, h: 40 },
+            { id: 'S7_R1', type: 'diamond', label: 'S7', x: 600, y: 360, w: 40, h: 40 },
+            { id: 'S6_R2', type: 'diamond', label: 'S6', x: 660, y: 360, w: 40, h: 40 },
+            { id: 'S7_R2', type: 'diamond', label: 'S7', x: 730, y: 360, w: 40, h: 40 },
+            { id: 'S8', type: 'diamond', label: 'S8', x: 200, y: 440, w: 60, h: 40 },
+            { id: 'S9', type: 'diamond', label: 'S9', x: 400, y: 440, w: 60, h: 40 },
+            { id: 'S10', type: 'diamond', label: 'S10', x: 600, y: 440, w: 60, h: 40 },
+            { id: 'Reject_rect', type: 'rect', label: 'Reject', x: 360, y: 520, w: 80, h: 30 },
+            { id: 'Accept_rect', type: 'rect', label: 'Accept', x: 750, y: 15, w: 70, h: 30 }
         ],
         pdaLines: [
-            { from: 'b_start', to: 'b_read1', sideFrom: 'bottom', sideTo: 'top', label: '' },
-            { from: 'b_read1', to: 'b_push1', sideFrom: 'left', sideTo: 'right', label: 'a' },
-            { from: 'b_push1', to: 'b_read1', sideFrom: 'top', sideTo: 'topLeft', label: 'X', isCustomPath: true, path: 'M 85 140 L 85 95 L 210 95 L 210 130' },
-            { from: 'b_read1', to: 'b_pop2', sideFrom: 'right', sideTo: 'left', label: 'Δ' },
-            { from: 'b_read1', to: 'b_pop1', sideFrom: 'bottom', sideTo: 'top', label: 'b' },
-            { from: 'b_pop1', to: 'b_read2', sideFrom: 'right', sideTo: 'left', label: 'X' },
-            { from: 'b_pop1', to: 'b_reject', sideFrom: 'bottom', sideTo: 'left', label: 'Δ', isCustomPath: true, path: 'M 250 290 L 250 430 L 425 430' },
-            { from: 'b_read2', to: 'b_pop1', sideFrom: 'top', sideTo: 'right', label: 'b', isCustomPath: true, path: 'M 470 260 L 470 215 L 320 215 L 300 260' },
-            { from: 'b_read2', to: 'b_pop2', sideFrom: 'right', sideTo: 'bottom', label: 'Δ', isCustomPath: true, path: 'M 520 290 L 690 290 L 690 160' },
-            { from: 'b_read2', to: 'b_reject', sideFrom: 'bottom', sideTo: 'top', label: 'a' },
-            { from: 'b_pop2', to: 'b_accept', sideFrom: 'top', sideTo: 'bottom', label: 'Δ' },
-            { from: 'b_pop2', to: 'b_reject', sideFrom: 'right', sideTo: 'right', label: 'X', isCustomPath: true, path: 'M 740 160 L 790 160 L 790 430 L 515 430' }
+            { from: 'Start_rect', to: 'S0', sideFrom: 'bottom', sideTo: 'top', label: '' },
+            { from: 'S0', to: 'Push_rect', sideFrom: 'left', sideTo: 'right', label: 'Δ, Z0→Z0', isCustomPath: true, path: 'M 370 80 L 85 80 L 85 40' },
+            { from: 'S0', to: 'S1', sideFrom: 'bottom', sideTo: 'top', label: 'a, Z0→Z0' },
+            { from: 'S0', to: 'S2', sideFrom: 'bottom', sideTo: 'top', label: 'b, Z0→Z0' },
+            { from: 'S1', to: 'S3_L', sideFrom: 'bottom', sideTo: 'top', label: 'a, Z0→Z0' },
+            { from: 'S1', to: 'T_L', sideFrom: 'bottom', sideTo: 'top', label: 'b, Z0→Z0' },
+            { from: 'S2', to: 'T_R', sideFrom: 'bottom', sideTo: 'top', label: 'a, Z0→Z0' },
+            { from: 'S2', to: 'S3_R', sideFrom: 'bottom', sideTo: 'top', label: 'b, Z0→Z0' },
+            { from: 'T_L', to: 'T_L', sideFrom: 'bottom', sideTo: 'right', label: 'a,b, Z0→Z0', isCustomPath: true, path: 'M 310 240 C 290 260, 260 240, 295 220' },
+            { from: 'T_R', to: 'T_R', sideFrom: 'bottom', sideTo: 'right', label: 'a,b, Z0→Z0', isCustomPath: true, path: 'M 470 240 C 450 260, 420 240, 455 220' },
+            { from: 'S3_L', to: 'S4_L', sideFrom: 'bottom', sideTo: 'top', label: 'a, Z0→Z0' },
+            { from: 'S3_L', to: 'S5_L', sideFrom: 'bottom', sideTo: 'top', label: 'b, Z0→Z0' },
+            { from: 'S3_R', to: 'S4_R', sideFrom: 'bottom', sideTo: 'top', label: 'a, Z0→Z0' },
+            { from: 'S3_R', to: 'S5_R', sideFrom: 'bottom', sideTo: 'top', label: 'b, Z0→Z0' },
+            { from: 'S4_L', to: 'S6_L1', sideFrom: 'bottom', sideTo: 'top', label: 'a, Z0→Z0' },
+            { from: 'S4_L', to: 'S7_L1', sideFrom: 'bottom', sideTo: 'top', label: 'b, Z0→Z0' },
+            { from: 'S5_L', to: 'S6_L2', sideFrom: 'bottom', sideTo: 'top', label: 'a, Z0→Z0' },
+            { from: 'S5_L', to: 'S7_L2', sideFrom: 'bottom', sideTo: 'top', label: 'b, Z0→Z0' },
+            { from: 'S4_R', to: 'S6_R1', sideFrom: 'bottom', sideTo: 'top', label: 'a, Z0→Z0' },
+            { from: 'S4_R', to: 'S7_R1', sideFrom: 'bottom', sideTo: 'top', label: 'b, Z0→Z0' },
+            { from: 'S5_R', to: 'S6_R2', sideFrom: 'bottom', sideTo: 'top', label: 'a, Z0→Z0' },
+            { from: 'S5_R', to: 'S7_R2', sideFrom: 'bottom', sideTo: 'top', label: 'b, Z0→Z0' },
+            { from: 'S6_L1', to: 'S8', sideFrom: 'bottom', sideTo: 'top', label: 'a, Z0→Z0' },
+            { from: 'S7_L1', to: 'S9', sideFrom: 'bottom', sideTo: 'topLeft', label: 'b, Z0→Z0' },
+            { from: 'S6_L2', to: 'S8', sideFrom: 'bottom', sideTo: 'top', label: 'a, Z0→Z0' },
+            { from: 'S7_L2', to: 'S9', sideFrom: 'bottom', sideTo: 'topLeft', label: 'b, Z0→Z0' },
+            { from: 'S6_R1', to: 'S9', sideFrom: 'bottom', sideTo: 'topRight', label: 'b, Z0→Z0' },
+            { from: 'S7_R1', to: 'S10', sideFrom: 'bottom', sideTo: 'top', label: 'a, Z0→Z0' },
+            { from: 'S6_R2', to: 'S9', sideFrom: 'bottom', sideTo: 'topRight', label: 'b, Z0→Z0' },
+            { from: 'S7_R2', to: 'S10', sideFrom: 'bottom', sideTo: 'top', label: 'a, Z0→Z0' },
+            { from: 'S8', to: 'S8', sideFrom: 'left', sideTo: 'bottom', label: 'a, Z0→Z0', isCustomPath: true, path: 'M 170 440 C 140 440, 140 470, 180 460' },
+            { from: 'S8', to: 'S9', sideFrom: 'right', sideTo: 'left', label: 'b, Z0→Z0' },
+            { from: 'S9', to: 'S10', sideFrom: 'right', sideTo: 'left', label: 'a, Z0→Z0', isCustomPath: true, path: 'M 430 435 L 570 435' },
+            { from: 'S10', to: 'S9', sideFrom: 'left', sideTo: 'right', label: 'b, Z0→Z0', isCustomPath: true, path: 'M 570 445 L 430 445' },
+            { from: 'S10', to: 'S10', sideFrom: 'right', sideTo: 'bottom', label: 'a, Z0→Z0', isCustomPath: true, path: 'M 630 440 C 660 440, 660 470, 620 460' },
+            { from: 'S9', to: 'S9', sideFrom: 'bottom', sideTo: 'right', label: 'b, Z0→Z0', isCustomPath: true, path: 'M 400 460 C 420 490, 440 480, 420 455' },
+            { from: 'S9', to: 'Reject_rect', sideFrom: 'bottom', sideTo: 'top', label: '' },
+            { from: 'S10', to: 'Accept_rect', sideFrom: 'bottom', sideTo: 'bottom', label: 'Δ, Z0→Z0', isCustomPath: true, path: 'M 600 460 L 600 500 L 785 500 L 785 45' }
         ]
     },
     '01': {
@@ -87,7 +156,6 @@ const automataData = {
             'S14': { '1': 'S14', '0': 'S13' },
             'S15': { '1': 'S7',  '0': 'S13' }
         },
-        // Refactored Structured Coordinate Matrix Map for Alphabet {0, 1}
         nodes: {
             'S0':  { x: 50,  y: 240 },
             'S1':  { x: 160, y: 120 },
@@ -107,33 +175,87 @@ const automataData = {
             'S14': { x: 800, y: 230 }
         },
         cfg: `S  → X Y Z\nX  → 101 | 111X | 100 | ε\nY  → 1Y | 0Y | 01Y | ε\nZ  → 111 | 000 | 101`,
+        
         pda: [
-            { curr: 'p0', input: '1', pop: 'Z0', next: 'p0', push: '1Z0' },
-            { curr: 'p0', input: '0', pop: '1', next: 'p1', push: 'ε' }
+            { curr: 'Start', input: 'Δ', pop: 'Z0', next: 'S0', push: 'Z0' },
+            { curr: 'S0', input: '0', pop: 'Z0', next: 'S2', push: 'Z0' },
+            { curr: 'S0', input: '1', pop: 'Z0', next: 'S1', push: 'Z0' },
+            { curr: 'S1', input: '0', pop: 'Z0', next: 'S4', push: 'Z0' },
+            { curr: 'S1', input: '1', pop: 'Z0', next: 'S3', push: 'Z0' },
+            { curr: 'S2', input: '0', pop: 'Z0', next: 'S5', push: 'Z0' },
+            { curr: 'S5', input: '1', pop: 'Z0', next: 'S8', push: 'Z0' },
+            { curr: 'S5', input: '0', pop: 'Z0', next: 'S6', push: 'Z0' },
+            { curr: 'S8', input: '0', pop: 'Z0', next: 'S6', push: 'Z0' },
+            { curr: 'S8', input: '1', pop: 'Z0', next: 'S10', push: 'Z0' },
+            { curr: 'S10', input: '1', pop: 'Z0', next: 'S2', push: 'Z0' },
+            { curr: 'S4', input: '0', pop: 'Z0', next: 'S6', push: 'Z0' },
+            { curr: 'S4', input: '1', pop: 'Z0', next: 'S9_1', push: 'Z0' },
+            { curr: 'S6', input: '0', pop: 'Z0', next: 'S11', push: 'Z0' },
+            { curr: 'S6', input: '1', pop: 'Z0', next: 'S9_1', push: 'Z0' },
+            { curr: 'S11', input: '1', pop: 'Z0', next: 'S10', push: 'Z0' },
+            { curr: 'S3', input: '1', pop: 'Z0', next: 'S7', push: 'Z0' },
+            { curr: 'S3', input: '0', pop: 'Z0', next: 'S15', push: 'Z0' },
+            { curr: 'S7', input: '1', pop: 'Z0', next: 'S15', push: 'Z0' },
+            { curr: 'S7', input: '0', pop: 'Z0', next: 'S13', push: 'Z0' },
+            { curr: 'S13', input: '1', pop: 'Z0', next: 'S9_2', push: 'Z0' },
+            { curr: 'S13', input: '0', pop: 'Z0', next: 'S14', push: 'Z0' },
+            { curr: 'S14', input: '1', pop: 'Z0', next: 'S14', push: 'Z0' }
         ],
         pdaBlocks: [
-            { id: 'b2_start',  type: 'rect', label: 'Start', x: 200, y: 30, w: 90, h: 40 },
-            { id: 'b2_read1',  type: 'diamond', label: 'Read', x: 200, y: 130, w: 100, h: 60 },
-            { id: 'b2_push1',  type: 'rect', label: 'Push 1', x: 40, y: 140, w: 90, h: 40 },
-            { id: 'b2_pop1',   type: 'diamond', label: 'Pop', x: 200, y: 260, w: 100, h: 60 },
-            { id: 'b2_read2',  type: 'diamond', label: 'Read', x: 420, y: 260, w: 100, h: 60 },
-            { id: 'b2_pop2',   type: 'diamond', label: 'Pop', x: 640, y: 130, w: 100, h: 60 },
-            { id: 'b2_accept', type: 'rect', label: 'Accept', x: 645, y: 30, w: 90, h: 40 },
-            { id: 'b2_reject', type: 'rect', label: 'Reject', x: 425, y: 410, w: 90, h: 40 }
+            { id: 'Start_rect', type: 'rect', label: 'Start', x: 420, y: 15, w: 70, h: 25 },
+            { id: 'Push_rect', type: 'rect', label: 'Push', x: 50, y: 15, w: 70, h: 25 },
+            { id: 'S0', type: 'diamond', label: 'S0', x: 420, y: 80, w: 50, h: 40 },
+            { id: 'S2', type: 'diamond', label: 'S2', x: 240, y: 150, w: 50, h: 40 },
+            { id: 'S1', type: 'diamond', label: 'S1', x: 420, y: 150, w: 50, h: 40 },
+            { id: 'S3', type: 'diamond', label: 'S3', x: 550, y: 150, w: 50, h: 40 },
+            { id: 'S13', type: 'diamond', label: 'S13', x: 670, y: 150, w: 50, h: 40 },
+            { id: 'S14', type: 'diamond', label: 'S14', x: 770, y: 150, w: 50, h: 40 },
+            { id: 'S5', type: 'diamond', label: 'S5', x: 240, y: 220, w: 50, h: 40 },
+            { id: 'S4', type: 'diamond', label: 'S4', x: 420, y: 220, w: 50, h: 40 },
+            { id: 'S7', type: 'diamond', label: 'S7', x: 610, y: 220, w: 50, h: 40 },
+            { id: 'S8', type: 'diamond', label: 'S8', x: 240, y: 290, w: 50, h: 40 },
+            { id: 'S6', type: 'diamond', label: 'S6', x: 350, y: 290, w: 50, h: 40 },
+            { id: 'S9_1', type: 'diamond', label: 'S9', x: 480, y: 290, w: 50, h: 40 },
+            { id: 'S15', type: 'diamond', label: 'S15', x: 550, y: 290, w: 50, h: 40 },
+            { id: 'S9_2', type: 'diamond', label: 'S9', x: 710, y: 290, w: 50, h: 40 },
+            { id: 'S10', type: 'diamond', label: 'S10', x: 240, y: 370, w: 50, h: 40 },
+            { id: 'S11', type: 'diamond', label: 'S11', x: 420, y: 370, w: 50, h: 40 },
+            { id: 'Reject_rect', type: 'rect', label: 'Reject', x: 420, y: 440, w: 80, h: 30 },
+            { id: 'Accept_rect', type: 'rect', label: 'Accept', x: 750, y: 300, w: 60, h: 100 }
         ],
         pdaLines: [
-            { from: 'b2_start', to: 'b2_read1', sideFrom: 'bottom', sideTo: 'top', label: '' },
-            { from: 'b2_read1', to: 'b2_push1', sideFrom: 'left', sideTo: 'right', label: '1' },
-            { from: 'b2_push1', to: 'b2_read1', sideFrom: 'top', sideTo: 'topLeft', label: '1', isCustomPath: true, path: 'M 85 140 L 85 95 L 210 95 L 210 130' },
-            { from: 'b2_read1', to: 'b2_pop2', sideFrom: 'right', sideTo: 'left', label: 'Δ' },
-            { from: 'b2_read1', to: 'b2_pop1', sideFrom: 'bottom', sideTo: 'top', label: '0' },
-            { from: 'b2_pop1', to: 'b2_read2', sideFrom: 'right', sideTo: 'left', label: '1' },
-            { from: 'b2_pop1', to: 'b2_reject', sideFrom: 'bottom', sideTo: 'left', label: 'Δ', isCustomPath: true, path: 'M 250 290 L 250 430 L 425 430' },
-            { from: 'b2_read2', to: 'b2_pop1', sideFrom: 'top', sideTo: 'right', label: '0', isCustomPath: true, path: 'M 470 260 L 470 215 L 320 215 L 300 260' },
-            { from: 'b2_read2', to: 'b2_pop2', sideFrom: 'right', sideTo: 'bottom', label: 'Δ', isCustomPath: true, path: 'M 520 290 L 690 290 L 690 160' },
-            { from: 'b2_read2', to: 'b2_reject', sideFrom: 'bottom', sideTo: 'top', label: '1' },
-            { from: 'b2_pop2', to: 'b2_accept', sideFrom: 'top', sideTo: 'bottom', label: 'Δ' },
-            { from: 'b2_pop2', to: 'b2_reject', sideFrom: 'right', sideTo: 'right', label: '1', isCustomPath: true, path: 'M 740 160 L 790 160 L 790 430 L 515 430' }
+            { from: 'Start_rect', to: 'S0', sideFrom: 'bottom', sideTo: 'top', label: 'Δ, Z0→Z0' },
+            { from: 'S0', to: 'Push_rect', sideFrom: 'left', sideTo: 'right', label: 'Δ, Z0→Z0', isCustomPath: true, path: 'M 395 80 L 85 80 L 85 40' },
+            { from: 'S0', to: 'S2', sideFrom: 'bottom', sideTo: 'top', label: '0, Z0→Z0' },
+            { from: 'S0', to: 'S1', sideFrom: 'bottom', sideTo: 'top', label: '1, Z0→Z0' },
+            { from: 'S2', to: 'S5', sideFrom: 'bottom', sideTo: 'top', label: '0, Z0→Z0' },
+            { from: 'S5', to: 'S8', sideFrom: 'bottom', sideTo: 'top', label: '1, Z0→Z0' },
+            { from: 'S5', to: 'S6', sideFrom: 'bottom', sideTo: 'topLeft', label: '0, Z0→Z0' },
+            { from: 'S8', to: 'S6', sideFrom: 'bottom', sideTo: 'left', label: '0, Z0→Z0' },
+            { from: 'S8', to: 'S10', sideFrom: 'bottom', sideTo: 'top', label: '1, Z0→Z0' },
+            { from: 'S10', to: 'S2', sideFrom: 'left', sideTo: 'left', label: '1, Z0→Z0', isCustomPath: true, path: 'M 215 370 C 130 350, 130 170, 215 150' },
+            { from: 'S10', to: 'Reject_rect', sideFrom: 'bottom', sideTo: 'left', label: '0, Z0→Z0', isCustomPath: true, path: 'M 240 390 L 240 455 L 420 455' },
+            { from: 'S1', to: 'S4', sideFrom: 'bottom', sideTo: 'top', label: '0, Z0→Z0' },
+            { from: 'S1', to: 'S3', sideFrom: 'bottom', sideTo: 'topLeft', label: '1, Z0→Z0' },
+            { from: 'S4', to: 'S6', sideFrom: 'bottom', sideTo: 'topRight', label: '0, Z0→Z0' },
+            { from: 'S4', to: 'S9_1', sideFrom: 'bottom', sideTo: 'top', label: '1, Z0→Z0' },
+            { from: 'S6', to: 'S11', sideFrom: 'bottom', sideTo: 'top', label: '0, Z0→Z0' },
+            { from: 'S6', to: 'S9_1', sideFrom: 'bottom', sideTo: 'left', label: '1, Z0→Z0' },
+            { from: 'S11', to: 'S10', sideFrom: 'left', sideTo: 'right', label: '1, Z0→Z0' },
+            { from: 'S11', to: 'Reject_rect', sideFrom: 'bottom', sideTo: 'top', label: '0, Z0→Z0' },
+            { from: 'S3', to: 'S7', sideFrom: 'bottom', sideTo: 'top', label: '1, Z0→Z0' },
+            { from: 'S3', to: 'S15', sideFrom: 'bottom', sideTo: 'top', label: '0, Z0→Z0' },
+            { from: 'S7', to: 'S15', sideFrom: 'bottom', sideTo: 'right', label: '1, Z0→Z0' },
+            { from: 'S7', to: 'S13', sideFrom: 'top', sideTo: 'bottom', label: '0, Z0→Z0', isCustomPath: true, path: 'M 610 200 L 670 170' },
+            { from: 'S13', to: 'S9_2', sideFrom: 'bottom', sideTo: 'top', label: '1, Z0→Z0' },
+            { from: 'S13', to: 'S14', sideFrom: 'right', sideTo: 'left', label: '0, Z0→Z0' },
+            { from: 'S14', to: 'S14', sideFrom: 'top', sideTo: 'right', label: '1, Z0→Z0', isCustomPath: true, path: 'M 780 130 C 810 100, 830 130, 810 150' },
+            { from: 'S14', to: 'S13', sideFrom: 'left', sideTo: 'right', label: '0, Z0→Z0', isCustomPath: true, path: 'M 770 140 C 750 120, 720 120, 695 140' },
+            { from: 'S13', to: 'Reject_rect', sideFrom: 'bottom', sideTo: 'right', label: '', isCustomPath: true, path: 'M 670 170 L 830 170 L 830 460 L 500 460' },
+            { from: 'S9_2', to: 'Accept_rect', sideFrom: 'right', sideTo: 'left', label: 'Δ, Z0→Z0' },
+            { from: 'S14', to: 'Accept_rect', sideFrom: 'bottom', sideTo: 'top', label: 'Δ, Z0→Z0', isCustomPath: true, path: 'M 795 170 L 795 300' },
+            { from: 'S15', to: 'Accept_rect', sideFrom: 'bottom', sideTo: 'left', label: 'Δ, Z0→Z0', isCustomPath: true, path: 'M 550 310 L 550 390 L 750 390' },
+            { from: 'S7', to: 'Accept_rect', sideFrom: 'bottom', sideTo: 'left', label: 'Δ, Z0→Z0', isCustomPath: true, path: 'M 610 240 L 610 330 L 750 330' }
         ]
     }
 };
@@ -298,7 +420,6 @@ function renderSVGGraph(activeState = null, activeTransition = null) {
                 let textX = (x1 + x2) / 2;
                 let textY = (y1 + y2) / 2 - 7;
 
-                // Intelligently curve overlapping back-loops and broad transitions to remain completely scannable
                 const isOverlappingLoop = (currentAlphabet === 'ab' && ((src === 'S8' && dest === 'S9') || (src === 'S9' && dest === 'S10') || (src === 'S10' && dest === 'S8'))) ||
                                            (currentAlphabet === '01' && ((src === 'S7' && dest === 'S13') || (src === 'S13' && dest === 'S9') || (src === 'S9' && dest === 'S13') || (src === 'S6' && dest === 'S5') || (src === 'S5' && dest === 'S10')));
 
@@ -364,8 +485,8 @@ function renderPDAGraph() {
     const container = document.getElementById('pda-canvas-container');
     if (!container) return;
 
-    const viewWidth = 840;
-    const viewHeight = 480;
+    const viewWidth = 860;
+    const viewHeight = 560;
 
     let pdaSvgHtml = `<svg width="${viewWidth}" height="${viewHeight}" viewBox="0 0 ${viewWidth} ${viewHeight}" class="mx-auto">`;
     
@@ -395,6 +516,7 @@ function renderPDAGraph() {
                 if (side === 'left') return { x: block.x - block.w / 2, y: block.y };
                 if (side === 'right') return { x: block.x + block.w / 2, y: block.y };
                 if (side === 'topLeft') return { x: block.x - block.w / 4, y: block.y - block.h / 4 };
+                if (side === 'topRight') return { x: block.x + block.w / 4, y: block.y - block.h / 4 };
             }
             return { x: block.x, y: block.y };
         };
@@ -414,9 +536,17 @@ function renderPDAGraph() {
             if (line.isCustomPath) {
                 tx = p1.x + (line.sideFrom === 'left' ? -15 : 15);
                 ty = p1.y - 8;
+                
+                if(line.path.includes('C')) {
+                    const match = line.path.match(/C ([\d\.]+) ([\d\.]+)/);
+                    if(match) {
+                        tx = (p1.x + parseFloat(match[1])) / 2;
+                        ty = (p1.y + parseFloat(match[2])) / 2 - 5;
+                    }
+                }
             }
             pdaSvgHtml += `
-                <text x="${tx}" y="${ty}" fill="#f59e0b" font-size="12" font-family="monospace" font-weight="bold" text-anchor="middle">${line.label}</text>
+                <text x="${tx}" y="${ty}" fill="#f59e0b" font-size="10" font-family="monospace" font-weight="bold" text-anchor="middle">${line.label}</text>
             `;
         }
     });
@@ -427,6 +557,7 @@ function renderPDAGraph() {
             let fillColor = '#1e293b';
             if (block.label === 'Accept') { strokeColor = '#10b981'; fillColor = '#064e3b'; }
             if (block.label === 'Reject') { strokeColor = '#f43f5e'; fillColor = '#4c0519'; }
+            if (block.label === 'Push' || block.label === 'Start') { strokeColor = '#6366f1'; fillColor = '#1e3a8a'; }
 
             pdaSvgHtml += `
                 <rect x="${block.x}" y="${block.y}" width="${block.w}" height="${block.h}" rx="6" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2" />
@@ -434,10 +565,17 @@ function renderPDAGraph() {
             `;
         } else if (block.type === 'diamond') {
             const points = `${block.x},${block.y - block.h / 2} ${block.x + block.w / 2},${block.y} ${block.x},${block.y + block.h / 2} ${block.x - block.w / 2},${block.y}`;
+            let strokeColor = '#6366f1';
+            let fillColor = '#0f172a';
             
+            if (['S8','S9','S10','S7','S11','S12','S13','S14','S15'].includes(block.label)) {
+                strokeColor = '#10b981';
+                fillColor = '#064e3b';
+            }
+
             pdaSvgHtml += `
-                <polygon points="${points}" fill="#0f172a" stroke="#6366f1" stroke-width="2" />
-                <text x="${block.x}" y="${block.y + 4}" fill="#f8fafc" font-size="12" font-weight="semibold" font-family="sans-serif" text-anchor="middle">${block.label}</text>
+                <polygon points="${points}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2" />
+                <text x="${block.x}" y="${block.y + 4}" fill="#f8fafc" font-size="11" font-weight="semibold" font-family="sans-serif" text-anchor="middle">${block.label}</text>
             `;
         }
     });
