@@ -1,130 +1,194 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Automata & Formal Languages Interactive Workspace</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&family=Fira+Code:wght=400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="DFA_Tester_CSS.css">
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body class="app-body min-h-screen flex flex-col">
 
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="bg-indigo-600 text-white p-2 rounded-xl font-bold shadow-md shadow-indigo-200">
+    <header class="app-header sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4 flex-wrap">
+            <div class="flex items-center space-x-3 min-w-0">
+                <div class="app-logo-badge text-white p-2 rounded-xl font-bold shadow-md">
                     ∑
                 </div>
                 <div>
-                    <span class="text-lg font-bold text-slate-900 tracking-tight">AutomataLab</span>
-                    <span class="text-xs block text-slate-500 font-medium -mt-1">Interactive Tracing System</span>
+                    <span class="text-lg font-bold tracking-tight app-title">AutomataLab</span>
+                    <span class="text-xs block font-medium -mt-1 app-subtitle">Interactive Tracing System</span>
                 </div>
             </div>
 
-            <div class="flex items-center space-x-2 bg-slate-100 p-1 rounded-xl">
-                <button id="btn-ab" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm bg-white text-indigo-600">
-                    Alphabet {a, b}
-                </button>
-                <button id="btn-01" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900">
-                    Alphabet {0, 1}
+            <div class="flex items-center gap-3 flex-wrap justify-end">
+                <div class="flex items-center gap-2 alphabet-control" aria-label="Switch alphabet preset">
+                    <span class="text-xs font-semibold uppercase tracking-wide app-muted hidden sm:inline">Alphabet</span>
+                    <div class="alphabet-segmented flex p-0.5 rounded-xl" role="group" aria-label="Alphabet selection">
+                        <button id="btn-ab" type="button" class="alphabet-btn alphabet-btn-active px-3 py-1.5 rounded-lg text-sm font-semibold transition-ui" title="Switch to alphabet {a, b}">a, b</button>
+                        <button id="btn-01" type="button" class="alphabet-btn px-3 py-1.5 rounded-lg text-sm font-semibold transition-ui" title="Switch to alphabet {0, 1}">0, 1</button>
+                    </div>
+                </div>
+
+                <button id="btn-theme-toggle" type="button" class="theme-toggle-btn flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-ui focus-ring" aria-label="Toggle light and dark theme" title="Toggle theme">
+                    <span id="theme-icon-light" class="theme-icon" aria-hidden="true">☀</span>
+                    <span id="theme-icon-dark" class="theme-icon hidden" aria-hidden="true">☾</span>
+                    <span class="hidden sm:inline" id="theme-label">Dark</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex-1 py-8 w-full grid grid-cols-1 lg:grid-cols-4 gap-8">
-        
-        <aside class="lg:col-span-1 space-y-2">
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">Component View</p>
-            <nav class="space-y-1">
-                <button id="tab-dfa" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-indigo-50 text-indigo-700 border-l-4 border-indigo-600">
-                    <span>Deterministic Finite Automata (DFA)</span>
-                </button>
-                <button id="tab-cfg" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-100">
-                    <span>Context-Free Grammar (CFG)</span>
-                </button>
-                <button id="tab-pda" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-100">
-                    <span>Pushdown Automata (PDA)</span>
-                </button>
-            </nav>
+    <div class="app-layout max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex-1 py-6 lg:py-8 w-full grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8 min-w-0">
 
-            <div class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-2xl p-5 mt-6 shadow-xl">
-                <h4 class="text-xs font-bold text-indigo-300 uppercase tracking-wider mb-2">Active Definition</h4>
-                <div id="sidebar-meta" class="space-y-3 text-sm"></div>
+        <aside class="lg:col-span-1 min-w-0">
+            <div class="sidebar-card rounded-2xl border overflow-hidden transition-ui">
+                <div class="sidebar-switcher p-3 border-b">
+                    <p class="text-xs font-bold uppercase tracking-wider px-2 mb-2 app-muted">Component View</p>
+                    <nav class="space-y-1" role="tablist" aria-label="Automaton component views">
+                        <button id="tab-dfa" type="button" role="tab" aria-selected="true" class="tab-btn tab-btn-active w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-ui focus-ring">
+                            <span class="tab-label">DFA</span>
+                            <span class="tab-desc block text-xs mt-0.5 font-normal">Finite-state acceptor for regular languages</span>
+                        </button>
+                        <button id="tab-cfg" type="button" role="tab" aria-selected="false" class="tab-btn w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-ui focus-ring">
+                            <span class="tab-label">CFG</span>
+                            <span class="tab-desc block text-xs mt-0.5 font-normal">Rewrite rules for context-free languages</span>
+                        </button>
+                        <button id="tab-pda" type="button" role="tab" aria-selected="false" class="tab-btn w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-ui focus-ring">
+                            <span class="tab-label">PDA</span>
+                            <span class="tab-desc block text-xs mt-0.5 font-normal">Stack machine for context-free recognition</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <div class="sidebar-definition p-4">
+                    <h4 class="text-xs font-bold uppercase tracking-wider mb-3 app-muted">Active Definition</h4>
+                    <div id="sidebar-meta" class="space-y-3 text-sm"></div>
+                </div>
             </div>
         </aside>
 
-        <main class="lg:col-span-3 space-y-6">
+        <main class="lg:col-span-3 space-y-6 min-w-0">
 
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <span class="text-xs font-bold text-indigo-600 uppercase tracking-widest bg-indigo-50 px-2.5 py-1 rounded-md">Regular Expression Rule Set</span>
-                <div id="regex-display" class="mt-3 text-md font-mono font-semibold text-slate-800 break-all leading-relaxed"></div>
+            <div class="panel-card rounded-2xl border p-6 shadow-sm transition-ui">
+                <span class="regex-badge text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-md">Regular Expression Rule Set</span>
+                <div id="regex-display" class="mt-3 text-md font-mono font-semibold break-all leading-relaxed"></div>
             </div>
 
-            <div id="view-dfa" class="space-y-6">
-                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col">
+            <div id="view-dfa" class="view-panel space-y-6 transition-ui">
+                <div class="panel-card rounded-2xl border p-6 shadow-sm flex flex-col transition-ui">
                     <div class="mb-4">
-                        <h3 class="text-lg font-bold text-slate-900">Live DFA Transition Graph Viewer</h3>
-                        <p class="text-sm text-slate-500">Fixed boundary-aware offsets ensure visible arrow directionalities across all states.</p>
+                        <h3 class="text-lg font-bold">Live DFA Transition Graph Viewer</h3>
+                        <p class="text-sm app-muted">Hover a state to see outgoing transitions. Validate a string to trace its path.</p>
                     </div>
-                    <div class="border border-slate-100 rounded-xl bg-slate-900 overflow-hidden relative flex justify-center items-center p-4">
-                        <div id="canvas-container" class="w-full overflow-x-auto"></div>
+
+                    <div class="graph-panel rounded-xl border relative overflow-hidden">
+                        <div id="graph-viewport" class="graph-viewport w-full relative">
+                            <div id="canvas-container" class="graph-canvas w-full"></div>
+                        </div>
+
+                        <div class="graph-legend" aria-label="Graph legend">
+                            <div class="legend-item">
+                                <svg class="legend-icon" width="28" height="20" aria-hidden="true"><line x1="2" y1="10" x2="18" y2="10" stroke="currentColor" stroke-width="1.5"/><polygon points="18,6 26,10 18,14" fill="currentColor"/><circle cx="8" cy="10" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+                                <span>Start</span>
+                            </div>
+                            <div class="legend-item">
+                                <svg class="legend-icon" width="28" height="20" aria-hidden="true"><circle cx="14" cy="10" r="6" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="14" cy="10" r="4" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+                                <span>Accept</span>
+                            </div>
+                            <div class="legend-item">
+                                <svg class="legend-icon" width="28" height="20" aria-hidden="true"><circle cx="14" cy="10" r="6" fill="#f43f5e" stroke="#fb7185" stroke-width="1.5"/><text x="14" y="13" text-anchor="middle" fill="white" font-size="8" font-weight="bold">T</text></svg>
+                                <span>Trap</span>
+                            </div>
+                        </div>
+
+                        <div class="graph-zoom-controls" aria-label="Graph zoom controls">
+                            <button type="button" id="btn-zoom-in" class="zoom-btn focus-ring transition-ui" title="Zoom in" aria-label="Zoom in">+</button>
+                            <button type="button" id="btn-zoom-out" class="zoom-btn focus-ring transition-ui" title="Zoom out" aria-label="Zoom out">−</button>
+                            <button type="button" id="btn-zoom-reset" class="zoom-btn focus-ring transition-ui" title="Reset view" aria-label="Reset view">⟲</button>
+                        </div>
+
+                        <div id="graph-tooltip" class="graph-tooltip hidden" role="tooltip"></div>
+                    </div>
+
+                    <div id="trace-controls" class="trace-controls hidden mt-4 p-3 rounded-xl border transition-ui" aria-label="Step through trace">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="text-sm font-semibold">Step Through Trace</span>
+                            <button type="button" id="btn-trace-prev" class="trace-nav-btn focus-ring transition-ui" disabled>← Prev</button>
+                            <span id="trace-step-label" class="text-xs font-mono app-muted">Step 0 / 0</span>
+                            <button type="button" id="btn-trace-next" class="trace-nav-btn focus-ring transition-ui" disabled>Next →</button>
+                            <button type="button" id="btn-trace-play" class="trace-nav-btn focus-ring transition-ui">▶ Play</button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                    <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-4">
+                <div class="panel-card rounded-2xl border p-6 shadow-sm transition-ui">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 border-b pb-4 app-border">
                         <div>
-                            <h3 class="text-lg font-bold text-slate-900">Sequence Tester Matrix</h3>
-                            <p class="text-sm text-slate-500">Provide strings to evaluate state tracing paths across the verified structures.</p>
+                            <h3 class="text-lg font-bold">Sequence Tester</h3>
+                            <p class="text-sm app-muted">Enter strings to validate against the active DFA.</p>
                         </div>
+                        <button type="button" id="btn-clear-all" class="hidden px-4 py-2 border font-medium rounded-xl text-sm transition-ui focus-ring app-btn-secondary">
+                            Clear All
+                        </button>
                     </div>
 
                     <div id="matrix-rows" class="space-y-3"></div>
 
-                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                        <button id="btn-clear" class="px-4 py-2 border border-slate-200 text-slate-600 font-medium rounded-xl text-sm hover:bg-slate-50 transition">
-                            Clear Matrix
-                        </button>
-                        <button id="btn-validate-all" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm shadow-md shadow-indigo-100 transition">
-                            Validate All Outputs
+                    <div class="mt-4 flex flex-wrap gap-3">
+                        <button type="button" id="btn-add-row" class="px-4 py-2 border border-dashed font-medium rounded-xl text-sm transition-ui focus-ring app-btn-secondary">
+                            + Add Test Case
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div id="view-cfg" class="hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-                <h3 class="text-xl font-bold text-slate-900">Context-Free Grammar (CFG) Specification</h3>
-                <div class="bg-slate-900 text-emerald-400 p-6 rounded-xl font-mono text-sm leading-relaxed whitespace-pre" id="cfg-rules"></div>
+            <div id="view-cfg" class="view-panel hidden transition-ui">
+                <div id="cfg-empty" class="empty-state panel-card rounded-2xl border p-10 text-center hidden transition-ui">
+                    <div class="empty-state-icon text-4xl mb-3" aria-hidden="true">📝</div>
+                    <h3 class="text-xl font-bold mb-2">Context-Free Grammar</h3>
+                    <p class="text-sm app-muted max-w-md mx-auto">A CFG defines production rules that rewrite nonterminals into terminals and other symbols. Load or define a grammar to see its rules here.</p>
+                </div>
+                <div id="cfg-content" class="panel-card rounded-2xl border p-6 shadow-sm space-y-4 transition-ui">
+                    <h3 class="text-xl font-bold">Context-Free Grammar (CFG) Specification</h3>
+                    <pre id="cfg-rules" class="cfg-code p-6 rounded-xl font-mono text-sm leading-relaxed whitespace-pre overflow-x-auto"></pre>
+                </div>
             </div>
 
-            <div id="view-pda" class="hidden space-y-6">
-                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col">
-                    <div class="mb-4">
-                        <h3 class="text-lg font-bold text-slate-900">Live PDA Transition Graph Viewer</h3>
-                        <p class="text-sm text-slate-500">Displays state loops containing stack mutations in the classic format: <code>input, pop / push</code>.</p>
-                    </div>
-                    <div class="border border-slate-100 rounded-xl bg-slate-900 overflow-hidden relative flex justify-center items-center p-4">
-                        <div id="pda-canvas-container" class="w-full overflow-x-auto"></div>
-                    </div>
+            <div id="view-pda" class="view-panel hidden space-y-6 transition-ui">
+                <div id="pda-empty" class="empty-state panel-card rounded-2xl border p-10 text-center hidden transition-ui">
+                    <div class="empty-state-icon text-4xl mb-3" aria-hidden="true">📚</div>
+                    <h3 class="text-xl font-bold mb-2">Pushdown Automaton</h3>
+                    <p class="text-sm app-muted max-w-md mx-auto">A PDA extends a finite automaton with a stack for memory. Load or define a PDA to view its transition graph and formal δ table.</p>
                 </div>
+                <div id="pda-content" class="space-y-6">
+                    <div class="panel-card rounded-2xl border p-6 shadow-sm flex flex-col transition-ui">
+                        <div class="mb-4">
+                            <h3 class="text-lg font-bold">Live PDA Transition Graph Viewer</h3>
+                            <p class="text-sm app-muted">Stack operations shown as <code>input, pop / push</code>.</p>
+                        </div>
+                        <div class="graph-panel rounded-xl border relative overflow-hidden">
+                            <div id="pda-canvas-container" class="graph-canvas w-full p-4 flex justify-center"></div>
+                        </div>
+                    </div>
 
-                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-                    <h3 class="text-xl font-bold text-slate-900">Formal Delta Transition Matrix</h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 font-semibold">
-                                    <th class="p-3">Current State</th>
-                                    <th class="p-3">Input Symbol</th>
-                                    <th class="p-3">Pop Stack</th>
-                                    <th class="p-3">Next State</th>
-                                    <th class="p-3">Push Stack</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pda-table-body" class="divide-y divide-slate-100 text-slate-700 font-mono"></tbody>
-                        </table>
+                    <div class="panel-card rounded-2xl border p-6 shadow-sm space-y-4 transition-ui">
+                        <h3 class="text-xl font-bold">Formal Delta Transition Matrix</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr class="app-table-head">
+                                        <th class="p-3">Current State</th>
+                                        <th class="p-3">Input Symbol</th>
+                                        <th class="p-3">Pop Stack</th>
+                                        <th class="p-3">Next State</th>
+                                        <th class="p-3">Push Stack</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pda-table-body" class="divide-y font-mono app-table-body"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
