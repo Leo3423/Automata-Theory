@@ -467,6 +467,8 @@ function validateAllRows() {
         setTimeout(() => {
             const result = simulateDFA(inputVal);
             if (validateBtn) validateBtn.disabled = false;
+            
+            addHistoryEntry(inputVal, result.isAccepted, result.animationFrames);
 
             if (result.isAccepted) {
                 if (badge) badge.innerHTML = '<span class="result-badge result-badge-accepted">✓ Accepted</span>';
