@@ -1,130 +1,262 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Automata & Formal Languages Interactive Workspace</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&family=Fira+Code:wght=400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="DFA_Tester_CSS.css">
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body class="app-body min-h-screen flex flex-col lg:flex-row transition-ui">
 
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="bg-indigo-600 text-white p-2 rounded-xl font-bold shadow-md shadow-indigo-200">
-                    ∑
-                </div>
-                <div>
-                    <span class="text-lg font-bold text-slate-900 tracking-tight">AutomataLab</span>
-                    <span class="text-xs block text-slate-500 font-medium -mt-1">Interactive Tracing System</span>
-                </div>
+    <!-- Premium Sidebar Layout -->
+    <aside class="w-full lg:w-80 sidebar-card border-b lg:border-b-0 lg:border-r app-border flex flex-col shrink-0 transition-ui">
+        <!-- Logo Section -->
+        <div class="p-5 border-b app-border flex items-center space-x-3 shrink-0">
+            <img src="logo_atmt.png" alt="AutomataLab Logo" class="h-6 w-auto object-contain">
+            <div class="h-6 w-[1px] bg-slate-200 dark:bg-slate-800"></div>
+            <span class="text-[11px] font-semibold tracking-wide uppercase text-slate-400 dark:text-slate-500 leading-none">Interactive Tracing System</span>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <div class="p-5 flex-1 flex flex-col overflow-y-auto gap-8">
+            <div>
+                <nav class="space-y-2" role="tablist" aria-label="Automaton component views">
+                    <button id="tab-dfa" type="button" role="tab" aria-selected="true" class="tab-btn tab-btn-active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-ui focus-ring text-left">
+                        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="7" cy="12" r="3" />
+                            <circle cx="17" cy="12" r="3" />
+                            <path d="M10 12h4" />
+                            <path d="M7 6c0-2 2-3 5-3s5 1 5 3" />
+                        </svg>
+                        <span class="tab-label">Deterministic Finite Automata (DFA)</span>
+                    </button>
+                    <button id="tab-cfg" type="button" role="tab" aria-selected="false" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-ui focus-ring text-left">
+                        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="6" height="6" rx="1" />
+                            <rect x="15" y="15" width="6" height="6" rx="1" />
+                            <path d="M9 6h6v9" />
+                        </svg>
+                        <span class="tab-label">Context-Free Grammar (CFG)</span>
+                    </button>
+                    <button id="tab-pda" type="button" role="tab" aria-selected="false" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-ui focus-ring text-left">
+                        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                            <path d="M2 17l10 5 10-5" />
+                            <path d="M2 12l10 5 10-5" />
+                        </svg>
+                        <span class="tab-label">Pushdown Automata (PDA)</span>
+                    </button>
+                </nav>
             </div>
 
-            <div class="flex items-center space-x-2 bg-slate-100 p-1 rounded-xl">
-                <button id="btn-ab" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm bg-white text-indigo-600">
-                    Alphabet {a, b}
-                </button>
-                <button id="btn-01" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900">
-                    Alphabet {0, 1}
-                </button>
+            <!-- Active Definition Card -->
+            <div class="bg-[#111827] dark:bg-slate-950 text-white rounded-2xl p-5 shadow-lg space-y-4 border border-slate-800 shrink-0">
+                <h4 class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Active Definition</h4>
+                <div id="sidebar-meta" class="space-y-4"></div>
+            </div>
+
+            <!-- Test History -->
+            <div class="flex flex-col gap-2 flex-1 min-h-0">
+                <div class="flex items-center justify-between">
+                    <p class="text-[10px] font-bold uppercase tracking-widest app-muted">Test History</p>
+                    <button id="btn-clear-history" type="button" title="Clear history" class="text-slate-400 hover:text-red-400 transition-ui p-0.5 rounded">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+                        </svg>
+                    </button>
+                </div>
+                <div id="history-list" class="flex flex-col gap-1.5 overflow-y-auto max-h-64">
+                    <p id="history-empty" class="text-[11px] app-muted italic text-center py-4">No validations yet.</p>
+                </div>
             </div>
         </div>
-    </header>
+    </aside>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex-1 py-8 w-full grid grid-cols-1 lg:grid-cols-4 gap-8">
-        
-        <aside class="lg:col-span-1 space-y-2">
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">Component View</p>
-            <nav class="space-y-1">
-                <button id="tab-dfa" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-indigo-50 text-indigo-700 border-l-4 border-indigo-600">
-                    <span>Deterministic Finite Automata (DFA)</span>
-                </button>
-                <button id="tab-cfg" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-100">
-                    <span>Context-Free Grammar (CFG)</span>
-                </button>
-                <button id="tab-pda" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-100">
-                    <span>Pushdown Automata (PDA)</span>
-                </button>
-            </nav>
-
-            <div class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-2xl p-5 mt-6 shadow-xl">
-                <h4 class="text-xs font-bold text-indigo-300 uppercase tracking-wider mb-2">Active Definition</h4>
-                <div id="sidebar-meta" class="space-y-3 text-sm"></div>
-            </div>
-        </aside>
-
-        <main class="lg:col-span-3 space-y-6">
-
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <span class="text-xs font-bold text-indigo-600 uppercase tracking-widest bg-indigo-50 px-2.5 py-1 rounded-md">Regular Expression Rule Set</span>
-                <div id="regex-display" class="mt-3 text-md font-mono font-semibold text-slate-800 break-all leading-relaxed"></div>
-            </div>
-
-            <div id="view-dfa" class="space-y-6">
-                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col">
-                    <div class="mb-4">
-                        <h3 class="text-lg font-bold text-slate-900">Live DFA Transition Graph Viewer</h3>
-                        <p class="text-sm text-slate-500">Fixed boundary-aware offsets ensure visible arrow directionalities across all states.</p>
-                    </div>
-                    <div class="border border-slate-100 rounded-xl bg-slate-900 overflow-hidden relative flex justify-center items-center p-4">
-                        <div id="canvas-container" class="w-full overflow-x-auto"></div>
+    <!-- Main Content Panel -->
+    <div class="flex-1 flex flex-col min-w-0 min-h-screen">
+        <!-- Top bar controls -->
+        <header class="app-header h-16 border-b app-border px-6 flex items-center justify-end shrink-0 transition-ui">
+            <div class="flex items-center gap-6">
+                <div class="flex items-center alphabet-control" aria-label="Switch alphabet preset">
+                    <div class="alphabet-segmented flex p-1 rounded-[1rem] border app-border" role="group" aria-label="Alphabet selection">
+                        <button id="btn-ab" type="button" class="alphabet-btn alphabet-btn-active px-4 py-1.5 rounded-[0.75rem] text-sm font-bold transition-ui" title="Switch to alphabet {a, b}">Regex {a, b}</button>
+                        <button id="btn-01" type="button" class="alphabet-btn px-4 py-1.5 rounded-[0.75rem] text-sm font-bold transition-ui" title="Switch to alphabet {0, 1}">Regex {0, 1}</button>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                    <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-4">
-                        <div>
-                            <h3 class="text-lg font-bold text-slate-900">Sequence Tester Matrix</h3>
-                            <p class="text-sm text-slate-500">Provide strings to evaluate state tracing paths across the verified structures.</p>
+                <button id="btn-theme-toggle" type="button" class="theme-toggle-btn flex items-center gap-2 px-4 py-2 rounded-[1rem] text-sm font-bold transition-ui focus-ring border app-border" aria-label="Toggle light and dark theme" title="Toggle theme">
+                    <span id="theme-icon-light" class="theme-icon" aria-hidden="true">☀</span>
+                    <span id="theme-icon-dark" class="theme-icon hidden" aria-hidden="true">☾</span>
+                    <span class="hidden sm:inline" id="theme-label">Dark</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main View Area (Scrollable) -->
+        <main class="flex-1 p-6 lg:p-8 overflow-y-auto space-y-6 max-w-5xl w-full mx-auto">
+
+            <!-- Regular Expression Card -->
+            <div class="panel-card rounded-2xl border shadow-sm transition-ui flex flex-col">
+                <div class="flex items-center justify-between px-6 py-4 border-b app-border">
+                    <span class="text-[11px] font-bold uppercase tracking-widest" style="color: #60a5fa;">Regular Expression Rule Set</span>
+                    <button type="button" id="btn-regex-format" class="border app-border rounded-lg px-3 py-1.5 flex items-center gap-2 transition-ui hover:bg-black/10 dark:hover:bg-white/10 focus-ring active:scale-95" aria-label="Toggle Regex Format" title="Toggle Union Operator (+ or |)">
+                        <span class="text-[10px] font-bold uppercase tracking-wider app-muted">Format</span>
+                        <span id="regex-format-label" class="text-xs font-bold">USE |</span>
+                    </button>
+                </div>
+                <div class="p-8 sm:p-12 flex items-center justify-center min-h-[8rem]">
+                    <div id="regex-display" class="text-center text-lg sm:text-xl font-bold font-mono break-all leading-relaxed w-full"></div>
+                </div>
+            </div>
+
+            <!-- DFA view panel -->
+            <div id="view-dfa" class="view-panel space-y-6 transition-ui">
+                <!-- This container toggles between stacked and side-by-side -->
+                <div id="dfa-layout" class="dfa-layout-stacked">
+
+                    <!-- Graph Card -->
+                    <div id="dfa-graph-card" class="panel-card rounded-2xl border p-6 shadow-sm flex flex-col transition-ui">
+                        <div class="mb-4">
+                            <h3 class="text-lg font-bold">Live DFA Transition Graph Viewer</h3>
+                            <p class="text-sm app-muted">Hover a state to see outgoing transitions. Validate a string to trace its path.</p>
+                        </div>
+
+                        <div class="graph-panel rounded-xl border relative overflow-hidden">
+                            <div id="graph-viewport" class="graph-viewport w-full relative">
+                                <div id="canvas-container" class="graph-canvas w-full" style="cursor: grab; user-select: none;"></div>
+                            </div>
+
+                            <div class="graph-legend" aria-label="Graph legend">
+                                <div class="legend-item" style="gap: 0.5rem">
+                                    <svg class="legend-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                                        <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                                        <text x="10" y="14" font-size="12" font-weight="bold" text-anchor="middle" fill="currentColor" font-family="sans-serif">−</text>
+                                    </svg>
+                                    <span>Start</span>
+                                </div>
+                                <div class="legend-item" style="gap: 0.5rem">
+                                    <svg class="legend-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                                        <circle cx="10" cy="10" r="8" fill="none" stroke="#10b981" stroke-width="1.5"/>
+                                        <text x="10" y="14" font-size="12" font-weight="bold" text-anchor="middle" fill="#10b981" font-family="sans-serif">+</text>
+                                    </svg>
+                                    <span>Accept</span>
+                                </div>
+                                <div class="legend-item" style="gap: 0.5rem">
+                                    <svg class="legend-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+                                        <circle cx="10" cy="10" r="8" fill="#f43f5e" stroke="#fb7185" stroke-width="1.5"/>
+                                        <text x="10" y="13.5" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="monospace">T</text>
+                                    </svg>
+                                    <span>Trap</span>
+                                </div>
+                            </div>
+
+                            <div class="graph-zoom-controls" aria-label="Graph zoom controls">
+                                <button type="button" id="btn-zoom-in" class="zoom-btn focus-ring transition-ui" title="Zoom in" aria-label="Zoom in">+</button>
+                                <button type="button" id="btn-zoom-out" class="zoom-btn focus-ring transition-ui" title="Zoom out" aria-label="Zoom out">−</button>
+                                <button type="button" id="btn-zoom-reset" class="zoom-btn focus-ring transition-ui" title="Reset view" aria-label="Reset view">⟲</button>
+                            </div>
+
+                            <div id="graph-tooltip" class="graph-tooltip hidden" role="tooltip"></div>
+                        </div>
+
+                        <div id="trace-controls" class="trace-controls hidden mt-4 p-3 rounded-xl border transition-ui" aria-label="Step through trace">
+                            <div class="flex flex-wrap items-center gap-3">
+                                <span class="text-sm font-semibold">Step Through Trace</span>
+                                <button type="button" id="btn-trace-prev" class="trace-nav-btn focus-ring transition-ui" disabled>← Prev</button>
+                                <span id="trace-step-label" class="text-xs font-mono app-muted">Step 0 / 0</span>
+                                <button type="button" id="btn-trace-next" class="trace-nav-btn focus-ring transition-ui" disabled>Next →</button>
+                                <button type="button" id="btn-trace-play" class="trace-nav-btn focus-ring transition-ui">▶ Play</button>
+                                <div class="flex items-center gap-2 ml-auto">
+                                    <span class="text-xs app-muted font-semibold">Replay:</span>
+                                    <select id="trace-replay-select" class="trace-nav-btn focus-ring text-xs px-2 py-1 pr-6 cursor-pointer" style="appearance:auto; min-width:110px;">
+                                        <option value="">— pick a string —</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div id="matrix-rows" class="space-y-3"></div>
+                    <!-- Sequence Tester Card -->
+                    <div id="dfa-tester-card" class="panel-card rounded-2xl border p-6 shadow-sm transition-ui">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 border-b pb-4 app-border">
+                            <div>
+                                <h3 class="text-lg font-bold">Sequence Tester</h3>
+                                <p class="text-sm app-muted">Enter strings to validate against the active DFA.</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" id="btn-clear-all" class="hidden px-4 py-2 border font-medium rounded-xl text-sm transition-ui focus-ring app-btn-secondary">
+                                    Clear All
+                                </button>
+                                <button type="button" id="btn-finalize" class="px-4 py-2 font-semibold rounded-xl text-sm transition-ui focus-ring text-white" style="background: #059669;">
+                                    Dock to Side
+                                </button>
+                            </div>
+                        </div>
 
-                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                        <button id="btn-clear" class="px-4 py-2 border border-slate-200 text-slate-600 font-medium rounded-xl text-sm hover:bg-slate-50 transition">
-                            Clear Matrix
-                        </button>
-                        <button id="btn-validate-all" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm shadow-md shadow-indigo-100 transition">
-                            Validate All Outputs
-                        </button>
+                        <div id="matrix-rows" class="space-y-3"></div>
+
+                        <div class="mt-4 flex flex-wrap gap-3">
+                            <button type="button" id="btn-add-row" class="px-4 py-2 border border-dashed font-medium rounded-xl text-sm transition-ui focus-ring app-btn-secondary">
+                                + Add Test Case
+                            </button>
+                            <button type="button" id="btn-validate-all" class="px-4 py-2 font-semibold rounded-xl text-sm transition-ui focus-ring text-white" style="background: var(--app-accent);">
+                                Validate All Cases
+                            </button>
+                        </div>
                     </div>
+
                 </div>
             </div>
 
-            <div id="view-cfg" class="hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-                <h3 class="text-xl font-bold text-slate-900">Context-Free Grammar (CFG) Specification</h3>
-                <div class="bg-slate-900 text-emerald-400 p-6 rounded-xl font-mono text-sm leading-relaxed whitespace-pre" id="cfg-rules"></div>
+            <!-- CFG view panel -->
+            <div id="view-cfg" class="view-panel hidden transition-ui">
+                <div id="cfg-empty" class="empty-state panel-card rounded-2xl border p-10 text-center hidden transition-ui">
+                    <div class="empty-state-icon text-4xl mb-3" aria-hidden="true">📝</div>
+                    <h3 class="text-xl font-bold mb-2">Context-Free Grammar</h3>
+                    <p class="text-sm app-muted max-w-md mx-auto">A CFG defines production rules that rewrite nonterminals into terminals and other symbols. Load or define a grammar to see its rules here.</p>
+                </div>
+                <div id="cfg-content" class="panel-card rounded-2xl border p-6 shadow-sm space-y-4 transition-ui">
+                    <h3 class="text-xl font-bold">Context-Free Grammar (CFG) Specification</h3>
+                    <pre id="cfg-rules" class="cfg-code p-6 rounded-xl font-mono text-sm leading-relaxed whitespace-pre overflow-x-auto"></pre>
+                </div>
             </div>
 
-            <div id="view-pda" class="hidden space-y-6">
-                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col">
-                    <div class="mb-4">
-                        <h3 class="text-lg font-bold text-slate-900">Live PDA Transition Graph Viewer</h3>
-                        <p class="text-sm text-slate-500">Displays state loops containing stack mutations in the classic format: <code>input, pop / push</code>.</p>
-                    </div>
-                    <div class="border border-slate-100 rounded-xl bg-slate-900 overflow-hidden relative flex justify-center items-center p-4">
-                        <div id="pda-canvas-container" class="w-full overflow-x-auto"></div>
-                    </div>
+            <!-- PDA view panel -->
+            <div id="view-pda" class="view-panel hidden space-y-6 transition-ui">
+                <div id="pda-empty" class="empty-state panel-card rounded-2xl border p-10 text-center hidden transition-ui">
+                    <div class="empty-state-icon text-4xl mb-3" aria-hidden="true">📚</div>
+                    <h3 class="text-xl font-bold mb-2">Pushdown Automaton</h3>
+                    <p class="text-sm app-muted max-w-md mx-auto">A PDA extends a finite automaton with a stack for memory. Load or define a PDA to view its transition graph and formal δ table.</p>
                 </div>
+                <div id="pda-content" class="space-y-6">
+                    <div class="panel-card rounded-2xl border p-6 shadow-sm flex flex-col transition-ui">
+                        <div class="mb-4">
+                            <h3 class="text-lg font-bold">Live PDA Transition Graph Viewer</h3>
+                            <p class="text-sm app-muted">Stack operations shown as <code>input, pop / push</code>.</p>
+                        </div>
+                        <div class="graph-panel rounded-xl border relative overflow-hidden">
+                            <div id="pda-canvas-container" class="graph-canvas w-full p-4 flex justify-center"></div>
+                        </div>
+                    </div>
 
-                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-                    <h3 class="text-xl font-bold text-slate-900">Formal Delta Transition Matrix</h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 font-semibold">
-                                    <th class="p-3">Current State</th>
-                                    <th class="p-3">Input Symbol</th>
-                                    <th class="p-3">Pop Stack</th>
-                                    <th class="p-3">Next State</th>
-                                    <th class="p-3">Push Stack</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pda-table-body" class="divide-y divide-slate-100 text-slate-700 font-mono"></tbody>
-                        </table>
+                    <div class="panel-card rounded-2xl border p-6 shadow-sm space-y-4 transition-ui">
+                        <h3 class="text-xl font-bold">Formal Delta Transition Matrix</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr class="app-table-head">
+                                        <th class="p-3">Current State</th>
+                                        <th class="p-3">Input Symbol</th>
+                                        <th class="p-3">Pop Stack</th>
+                                        <th class="p-3">Next State</th>
+                                        <th class="p-3">Push Stack</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pda-table-body" class="divide-y font-mono app-table-body"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

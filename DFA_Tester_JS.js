@@ -18,6 +18,7 @@ const automataData = {
             'S9': { 'a': 'S10', 'b': 'S9' },
             'S10': { 'a': 'S8', 'b': 'S9' }
         },
+        // Refactored Coordinate Map for maximum readability on Alphabet {a, b}
         nodes: {
             'S0':  { x: 60,  y: 200 },
             'S1':  { x: 180, y: 90  },
@@ -137,38 +138,38 @@ const automataData = {
         startState: 'S0',
         acceptStates: ['S7', 'S9', 'S11', 'S12', 'S13', 'S14', 'S15'],
         transitions: {
-            'S0':  { '1': 'S1',  '0': 'S2' },
-            'S1':  { '1': 'S3',  '0': 'S4' },
-            'S2':  { '1': 'S5',  '0': 'S6' },
-            'S3':  { '1': 'S7',  '0': 'S8' },
-            'S4':  { '1': 'S9',  '0': 'S6' },
-            'S5':  { '1': 'S10', '0': 'S8' },
-            'S6':  { '1': 'S5',  '0': 'S11' },
-            'S7':  { '1': 'S12', '0': 'S13' },
-            'S8':  { '1': 'S9',  '0': 'S6' },
-            'S9':  { '1': 'S14', '0': 'S13' },
+            'S0': { '1': 'S1', '0': 'S2' },
+            'S1': { '1': 'S3', '0': 'S4' },
+            'S2': { '1': 'S5', '0': 'S6' },
+            'S3': { '1': 'S7', '0': 'S8' },
+            'S4': { '1': 'S9', '0': 'S6' },
+            'S5': { '1': 'S10', '0': 'S8' },
+            'S6': { '1': 'S5', '0': 'S11' },
+            'S7': { '1': 'S12', '0': 'S13' },
+            'S8': { '1': 'S9', '0': 'S6' },
+            'S9': { '1': 'S14', '0': 'S13' },
             'S10': { '1': 'S14', '0': 'S8' },
-            'S11': { '1': 'S9',  '0': 'S11' },
+            'S11': { '1': 'S9', '0': 'S11' },
             'S12': { '1': 'S15', '0': 'S13' },
-            'S13': { '1': 'S9',  '0': 'S11' },
+            'S13': { '1': 'S9', '0': 'S11' },
             'S14': { '1': 'S14', '0': 'S13' },
-            'S15': { '1': 'S7',  '0': 'S13' }
+            'S15': { '1': 'S7', '0': 'S13' }
         },
         nodes: {
-            'S0':  { x: 50,  y: 240 },
-            'S1':  { x: 160, y: 120 },
-            'S2':  { x: 160, y: 360 },
-            'S3':  { x: 280, y: 70  },
-            'S4':  { x: 280, y: 190 },
-            'S5':  { x: 280, y: 300 },
-            'S6':  { x: 280, y: 420 },
-            'S7':  { x: 420, y: 70  },
-            'S8':  { x: 420, y: 230 },
+            'S0': { x: 50, y: 240 },
+            'S1': { x: 160, y: 120 },
+            'S2': { x: 160, y: 360 },
+            'S3': { x: 280, y: 70 },
+            'S4': { x: 280, y: 190 },
+            'S5': { x: 280, y: 300 },
+            'S6': { x: 280, y: 420 },
+            'S7': { x: 420, y: 70 },
+            'S8': { x: 420, y: 230 },
             'S11': { x: 420, y: 420 },
-            'S12': { x: 560, y: 70  },
-            'S9':  { x: 560, y: 230 },
+            'S12': { x: 560, y: 70 },
+            'S9': { x: 560, y: 230 },
             'S10': { x: 560, y: 350 },
-            'S15': { x: 680, y: 70  },
+            'S15': { x: 680, y: 70 },
             'S13': { x: 680, y: 230 },
             'S14': { x: 800, y: 230 }
         },
@@ -261,119 +262,553 @@ const automataData = {
 let currentAlphabet = 'ab';
 let currentTab = 'dfa';
 let activeAnimationTimeout = null;
+let regexFormat = '+'; // can be '+' or '|'
+let testRowIds = [];
+let nextRowId = 0;
 
-document.addEventListener("DOMContentLoaded", () => {
-    renderRows();
+let graphBaseViewBox = null;
+let graphViewBox = null;
+let graphZoomLevel = 1;
+
+let activeTrace = {
+    frames: [],
+    index: 0,
+    playing: false
+};
+
+const TRACE_HIGHLIGHT = { fill: '#78350f', stroke: '#f59e0b', edge: '#fbbf24', text: '#ffffff' };
+
+document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    addTestRow();
     updateWorkspace();
+    bindGlobalEvents();
+});
 
+function bindGlobalEvents() {
     document.getElementById('btn-ab').addEventListener('click', () => switchAlphabet('ab'));
     document.getElementById('btn-01').addEventListener('click', () => switchAlphabet('01'));
     document.getElementById('tab-dfa').addEventListener('click', () => switchTab('dfa'));
     document.getElementById('tab-cfg').addEventListener('click', () => switchTab('cfg'));
     document.getElementById('tab-pda').addEventListener('click', () => switchTab('pda'));
-    document.getElementById('btn-clear').addEventListener('click', clearAllInputs);
-    document.getElementById('btn-validate-all').addEventListener('click', validateAll);
-});
+    document.getElementById('btn-theme-toggle').addEventListener('click', toggleTheme);
+    document.getElementById('btn-add-row').addEventListener('click', addTestRow);
+    document.getElementById('btn-clear-all').addEventListener('click', clearAllTestRows);
+    document.getElementById('btn-validate-all').addEventListener('click', validateAllRows);
+    document.getElementById('btn-zoom-in').addEventListener('click', () => adjustGraphZoom(1.2));
+    document.getElementById('btn-zoom-out').addEventListener('click', () => adjustGraphZoom(1 / 1.2));
+    document.getElementById('btn-zoom-reset').addEventListener('click', () => fitGraphToView());
+    document.getElementById('btn-trace-prev').addEventListener('click', () => stepTrace(-1));
+    document.getElementById('btn-trace-next').addEventListener('click', () => stepTrace(1));
+    document.getElementById('btn-trace-play').addEventListener('click', playTraceAnimation);
+    document.getElementById('trace-replay-select').addEventListener('change', (e) => {
+        const idx = e.target.value;
+        if (idx === '') return;
+        replayTrace(parseInt(idx, 10));
+        e.target.value = '';
+    });
 
-function renderRows() {
+    const btnRegexFormat = document.getElementById('btn-regex-format');
+    if (btnRegexFormat) {
+        btnRegexFormat.addEventListener('click', () => {
+            regexFormat = regexFormat === '+' ? '|' : '+';
+            document.getElementById('regex-format-label').textContent = regexFormat === '+' ? 'USE |' : 'USE +';
+            updateWorkspace();
+        });
+    }
+
+    const canvasContainer = document.getElementById('canvas-container');
+    canvasContainer.addEventListener('mousemove', onGraphMouseMove);
+    canvasContainer.addEventListener('mouseleave', (e) => {
+        isDraggingGraph = false;
+        canvasContainer.style.cursor = 'grab';
+        hideGraphTooltip();
+    });
+
+    canvasContainer.addEventListener('mousedown', (e) => {
+        isDraggingGraph = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        startViewBoxX = graphViewBox.x;
+        startViewBoxY = graphViewBox.y;
+        canvasContainer.style.cursor = 'grabbing';
+    });
+
+    window.addEventListener('mouseup', () => {
+        if (isDraggingGraph) {
+            isDraggingGraph = false;
+            canvasContainer.style.cursor = 'grab';
+        }
+    });
+
+    document.getElementById('btn-finalize').addEventListener('click', toggleDockMode);
+    document.getElementById('btn-clear-history').addEventListener('click', clearHistory);
+}
+
+function addHistoryEntry(inputStr, accepted, frames) {
+    const list = document.getElementById('history-list');
+    const empty = document.getElementById('history-empty');
+    if (empty) empty.remove();
+
+    // Store frames for replay
+    const historyIdx = traceHistory.length;
+    traceHistory.push({ inputStr, accepted, frames });
+
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    item.innerHTML = `
+        <span class="history-string" title="${inputStr}">${inputStr || '(empty)'}</span>
+        <span class="${accepted ? 'history-badge-accepted' : 'history-badge-rejected'}">${accepted ? 'Accepted' : 'Rejected'}</span>
+    `;
+    list.prepend(item);
+
+    // Add to replay dropdown (newest on top = index 0 visible at bottom of list)
+    updateReplayDropdown();
+}
+
+function clearHistory() {
+    const list = document.getElementById('history-list');
+    list.innerHTML = '<p id="history-empty" class="text-[11px] app-muted italic text-center py-4">No validations yet.</p>';
+    traceHistory = [];
+    updateReplayDropdown();
+}
+
+let traceHistory = [];
+
+function updateReplayDropdown() {
+    const select = document.getElementById('trace-replay-select');
+    if (!select) return;
+    // Keep the placeholder option, rebuild the rest
+    select.innerHTML = '<option value="">— pick a string —</option>';
+    // Show newest first
+    for (let i = traceHistory.length - 1; i >= 0; i--) {
+        const entry = traceHistory[i];
+        const label = `${entry.inputStr || '(empty)'}  [${entry.accepted ? '✓' : '✗'}]`;
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = label;
+        select.appendChild(opt);
+    }
+}
+
+function replayTrace(historyIdx) {
+    const entry = traceHistory[historyIdx];
+    if (!entry) return;
+    if (activeAnimationTimeout) clearInterval(activeAnimationTimeout);
+    activeTrace.frames = entry.frames;
+    activeTrace.index = 0;
+    activeTrace.playing = false;
+    showTraceControls();
+    renderTraceStep();
+    if (currentTab === 'dfa') playTraceAnimation();
+}
+
+
+let isDocked = false;
+let isDraggingGraph = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let startViewBoxX = 0;
+let startViewBoxY = 0;
+
+function toggleDockMode() {
+    isDocked = !isDocked;
+    const layout = document.getElementById('dfa-layout');
+    const btn = document.getElementById('btn-finalize');
+
+    if (isDocked) {
+        layout.className = 'dfa-layout-docked';
+        btn.innerHTML = 'Undock';
+        btn.style.background = '#d97706';
+    } else {
+        layout.className = 'dfa-layout-stacked';
+        btn.innerHTML = 'Dock to Side';
+        btn.style.background = '#059669';
+    }
+}
+
+function initTheme() {
+    const saved = localStorage.getItem('automatalab-theme');
+    const theme = saved === 'dark' ? 'dark' : 'light';
+    applyTheme(theme, false);
+}
+
+function toggleTheme() {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(next, true);
+}
+
+function applyTheme(theme, persist) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const isDark = theme === 'dark';
+    document.getElementById('theme-icon-light').classList.toggle('hidden', isDark);
+    document.getElementById('theme-icon-dark').classList.toggle('hidden', !isDark);
+    document.getElementById('theme-label').textContent = isDark ? 'Light' : 'Dark';
+    if (persist) localStorage.setItem('automatalab-theme', theme);
+    if (currentTab === 'dfa') renderSVGGraph(getTraceFrameState());
+    if (currentTab === 'pda') renderPDAGraph();
+}
+
+function getTraceFrameState() {
+    if (!activeTrace.frames.length) return { activeState: null, activeTransition: null };
+    const frame = activeTrace.frames[activeTrace.index];
+    return { activeState: frame.node, activeTransition: frame.transition };
+}
+
+function createRowElement(id, canRemove) {
+    const div = document.createElement('div');
+    div.className = 'test-row';
+    div.setAttribute('data-row-id', id);
+    div.innerHTML = `
+        <div class="test-row-inner">
+            <input type="text" id="input-${id}" placeholder="Enter string (e.g., aababaa)…" class="test-row-input" autocomplete="off" />
+            <button type="button" id="action-validate-${id}" class="btn-validate">Validate</button>
+            <div class="test-row-actions">
+                <button type="button" id="clear-${id}" class="btn-remove-row" aria-label="Clear this case" title="Clear">↺</button>
+                ${canRemove ? `<button type="button" id="remove-${id}" class="btn-remove-row" aria-label="Remove test case" title="Remove">×</button>` : '<span></span>'}
+            </div>
+        </div>
+        <div class="result-cell">
+            <div id="badge-${id}"></div>
+            <div id="detail-${id}" class="result-detail"></div>
+        </div>
+    `;
+    div.querySelector(`#action-validate-${id}`).addEventListener('click', () => validateSingle(id));
+    div.querySelector(`#clear-${id}`).addEventListener('click', () => {
+        const input = document.getElementById(`input-${id}`);
+        if (input) input.value = '';
+        clearRowResult(id);
+    });
+    const removeBtn = div.querySelector(`#remove-${id}`);
+    if (removeBtn) removeBtn.addEventListener('click', () => removeTestRow(id));
+    div.querySelector(`#input-${id}`).addEventListener('keydown', e => {
+        if (e.key === 'Enter') validateSingle(id);
+    });
+    return div;
+}
+
+function addTestRow() {
+    const id = nextRowId++;
+    testRowIds.push(id);
+    const container = document.getElementById('matrix-rows');
+    // Update all existing remove buttons to show (now there are >1 rows)
+    if (testRowIds.length === 2) {
+        const firstId = testRowIds[0];
+        const firstRow = container.querySelector(`[data-row-id="${firstId}"]`);
+        if (firstRow) {
+            const existingSpan = firstRow.querySelector('span:last-child');
+            if (existingSpan) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.id = `remove-${firstId}`;
+                btn.className = 'btn-remove-row focus-ring';
+                btn.setAttribute('aria-label', 'Remove test case');
+                btn.textContent = '×';
+                btn.addEventListener('click', () => removeTestRow(firstId));
+                existingSpan.replaceWith(btn);
+            }
+        }
+    }
+    const canRemove = testRowIds.length > 1;
+    container.appendChild(createRowElement(id, canRemove));
+    updateClearAllVisibility();
+    const input = document.getElementById(`input-${id}`);
+    if (input) input.focus();
+}
+
+function removeTestRow(id) {
+    if (testRowIds.length <= 1) {
+        clearRowResult(id);
+        const input = document.getElementById(`input-${id}`);
+        if (input) input.value = '';
+        return;
+    }
+    testRowIds = testRowIds.filter(rid => rid !== id);
+    const row = document.querySelector(`[data-row-id="${id}"]`);
+    if (row) row.remove();
+    // If only 1 row left, hide its remove button
+    if (testRowIds.length === 1) {
+        const lastId = testRowIds[0];
+        const lastRow = document.querySelector(`[data-row-id="${lastId}"]`);
+        if (lastRow) {
+            const btn = lastRow.querySelector(`#remove-${lastId}`);
+            if (btn) {
+                const span = document.createElement('span');
+                btn.replaceWith(span);
+            }
+        }
+    }
+    updateClearAllVisibility();
+}
+
+function renderTestRows() {
     const container = document.getElementById('matrix-rows');
     container.innerHTML = '';
-    for(let i = 0; i < 10; i++) {
-        container.innerHTML += `
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center border-b border-slate-50 pb-3 last:border-0">
-                <div class="md:col-span-1 text-xs font-bold text-slate-400">#${i+1}</div>
-                <div class="md:col-span-4">
-                    <input type="text" id="input-${i}" placeholder="Enter test sequence string..." class="w-full font-mono text-sm px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-slate-50/50 hover:bg-slate-50 transition">
-                </div>
-                <div class="md:col-span-2">
-                    <button id="action-validate-${i}" class="w-full text-xs font-semibold px-3 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-indigo-600 hover:text-white transition duration-150">
-                        Validate
-                    </button>
-                </div>
-                <div class="md:col-span-5 flex flex-col justify-center px-1">
-                    <div id="badge-${i}"></div>
-                    <div id="path-${i}" class="text-xs text-slate-400 font-mono mt-1 whitespace-normal break-all"></div>
-                </div>
-            </div>
-        `;
+    testRowIds.forEach(id => {
+        const canRemove = testRowIds.length > 1;
+        container.appendChild(createRowElement(id, canRemove));
+    });
+}
+
+function updateClearAllVisibility() {
+    const btn = document.getElementById('btn-clear-all');
+    btn.classList.toggle('hidden', testRowIds.length <= 1);
+}
+
+function clearRowResult(id) {
+    const badge = document.getElementById(`badge-${id}`);
+    const detail = document.getElementById(`detail-${id}`);
+    if (badge) badge.innerHTML = '';
+    if (detail) detail.textContent = '';
+}
+
+function validateAllRows() {
+    // Run each row one at a time, waiting for trace animation to finish before next
+    const ids = [...testRowIds];
+    let i = 0;
+
+    function runNext() {
+        if (i >= ids.length) return;
+        const id = ids[i++];
+
+        // Run the simulation synchronously, show badge+detail, then play trace
+        const inputEl = document.getElementById(`input-${id}`);
+        const badge = document.getElementById(`badge-${id}`);
+        const detail = document.getElementById(`detail-${id}`);
+        const validateBtn = document.getElementById(`action-validate-${id}`);
+        const inputVal = inputEl ? inputEl.value.trim() : '';
+
+        if (!inputVal) {
+            runNext();
+            return;
+        }
+
+        if (validateBtn) validateBtn.disabled = true;
+        if (badge) badge.innerHTML = '<span class="result-badge"><span class="spinner"></span>Validating…</span>';
+        if (detail) detail.textContent = '';
+
+        setTimeout(() => {
+            const result = simulateDFA(inputVal);
+            if (validateBtn) validateBtn.disabled = false;
+
+            if (result.isAccepted) {
+                if (badge) badge.innerHTML = '<span class="result-badge result-badge-accepted">✓ Accepted</span>';
+                if (detail) detail.textContent = `Path: ${result.pathString}`;
+            } else {
+                if (badge) badge.innerHTML = '<span class="result-badge result-badge-rejected">✗ Rejected</span>';
+                if (detail) detail.textContent = result.invalidChar !== null
+                    ? `Invalid symbol '${result.invalidChar}'`
+                    : `Rejected at ${result.rejectAt || result.finalState}`;
+            }
+
+            // Load trace and play it, then move to next row when done
+            activeTrace.frames = result.animationFrames;
+            activeTrace.index = 0;
+            showTraceControls();
+            renderTraceStep();
+
+            if (currentTab === 'dfa') {
+                // Play animation, then after it completes kick off the next row
+                if (activeAnimationTimeout) clearInterval(activeAnimationTimeout);
+                activeTrace.playing = true;
+                updateTraceControlsUI();
+
+                activeAnimationTimeout = setInterval(() => {
+                    if (activeTrace.index >= activeTrace.frames.length - 1) {
+                        clearInterval(activeAnimationTimeout);
+                        activeAnimationTimeout = null;
+                        activeTrace.playing = false;
+                        updateTraceControlsUI();
+                        // Short pause between cases then go to next
+                        setTimeout(runNext, 400);
+                        return;
+                    }
+                    activeTrace.index++;
+                    renderTraceStep();
+                }, 600);
+            } else {
+                runNext();
+            }
+        }, 280);
     }
-    for(let i = 0; i < 10; i++) {
-        document.getElementById(`action-validate-${i}`).addEventListener('click', () => validateSingle(i));
-    }
+
+    runNext();
+}
+
+function clearAllTestRows() {
+    if (activeAnimationTimeout) clearInterval(activeAnimationTimeout);
+    stopTrace();
+    testRowIds = [];
+    nextRowId = 0;
+    document.getElementById('matrix-rows').innerHTML = '';
+    addTestRow();
+    renderSVGGraph();
 }
 
 function switchAlphabet(type) {
     currentAlphabet = type;
-    document.getElementById('btn-ab').className = type === 'ab' ? 'px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm bg-white text-indigo-600' : 'px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900';
-    document.getElementById('btn-01').className = type === '01' ? 'px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm bg-white text-indigo-600' : 'px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-900';
-    
+    document.getElementById('btn-ab').classList.toggle('alphabet-btn-active', type === 'ab');
+    document.getElementById('btn-01').classList.toggle('alphabet-btn-active', type === '01');
+
     if (activeAnimationTimeout) clearInterval(activeAnimationTimeout);
-    clearAllInputs();
+    stopTrace();
+    testRowIds.forEach(id => {
+        const input = document.getElementById(`input-${id}`);
+        if (input) input.value = '';
+        clearRowResult(id);
+    });
+    graphZoomLevel = 1;
     updateWorkspace();
 }
 
 function switchTab(tabName) {
     currentTab = tabName;
     ['dfa', 'cfg', 'pda'].forEach(t => {
-        const element = document.getElementById(`tab-${t}`);
-        if(t === tabName) {
-            element.className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-indigo-50 text-indigo-700 border-l-4 border-indigo-600";
-            document.getElementById(`view-${t}`).classList.remove('hidden');
-        } else {
-            element.className = "w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-600 hover:bg-slate-100";
-            document.getElementById(`view-${t}`).classList.add('hidden');
-        }
+        const tabBtn = document.getElementById(`tab-${t}`);
+        const view = document.getElementById(`view-${t}`);
+        const active = t === tabName;
+        tabBtn.classList.toggle('tab-btn-active', active);
+        tabBtn.setAttribute('aria-selected', active ? 'true' : 'false');
+        view.classList.toggle('hidden', !active);
     });
-    if (tabName === 'dfa') renderSVGGraph();
+    if (tabName === 'dfa') {
+        renderSVGGraph(getTraceFrameState());
+        fitGraphToView();
+    }
     if (tabName === 'pda') renderPDAGraph();
 }
 
 function updateWorkspace() {
     const data = automataData[currentAlphabet];
-    document.getElementById('regex-display').innerText = data.regex;
+    let displayRegex = data.regex;
+    if (regexFormat === '|') {
+        displayRegex = displayRegex.replace(/\+/g, '|');
+    }
+    document.getElementById('regex-display').innerText = displayRegex;
     document.getElementById('sidebar-meta').innerHTML = `
-        <div><span class="text-slate-400 block text-xs">Start State</span><span class="font-mono font-bold text-white">${data.startState}</span></div>
-        <div><span class="text-slate-400 block text-xs">Accepting Set</span><span class="font-mono font-bold text-emerald-400">${data.acceptStates.join(', ')}</span></div>
-        <div><span class="text-slate-400 block text-xs">Alphabet Rules Set</span><span class="font-mono font-bold text-amber-400">{ ${data.alphabet.join(', ')} }</span></div>
+        <div>
+            <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Start State</span>
+            <span class="font-mono text-lg font-bold text-white">${data.startState}</span>
+        </div>
+        <div>
+            <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Accepting Set</span>
+            <span class="font-mono text-lg font-bold text-emerald-400">${data.acceptStates.join(' ')}</span>
+        </div>
+        <div>
+            <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Alphabet Rules Set</span>
+            <span class="font-mono text-lg font-bold text-white">{ ${data.alphabet.join(', ')} }</span>
+        </div>
     `;
-    document.getElementById('cfg-rules').textContent = data.cfg;
+
+    const hasCfg = !!(data.cfg && data.cfg.trim());
+    document.getElementById('cfg-empty').classList.toggle('hidden', hasCfg);
+    document.getElementById('cfg-content').classList.toggle('hidden', !hasCfg);
+    if (hasCfg) document.getElementById('cfg-rules').textContent = data.cfg;
+
+    const hasPda = Array.isArray(data.pda) && data.pda.length > 0;
+    document.getElementById('pda-empty').classList.toggle('hidden', hasPda);
+    document.getElementById('pda-content').classList.toggle('hidden', !hasPda);
 
     const pdaTbody = document.getElementById('pda-table-body');
     pdaTbody.innerHTML = '';
-    data.pda.forEach(row => {
-        pdaTbody.innerHTML += `
-            <tr class="hover:bg-slate-50/80 transition">
-                <td class="p-3 font-semibold text-slate-900">${row.curr}</td>
-                <td class="p-3 text-amber-600">${row.input}</td>
-                <td class="p-3 text-rose-500">${row.pop}</td>
-                <td class="p-3 text-indigo-600">${row.next}</td>
-                <td class="p-3 text-emerald-600">${row.push}</td>
-            </tr>
-        `;
-    });
+    if (hasPda) {
+        data.pda.forEach(row => {
+            pdaTbody.innerHTML += `
+                <tr class="transition-ui">
+                    <td class="p-3 font-semibold">${row.curr}</td>
+                    <td class="p-3" style="color:#d97706">${row.input}</td>
+                    <td class="p-3" style="color:#f43f5e">${row.pop}</td>
+                    <td class="p-3" style="color:#6366f1">${row.next}</td>
+                    <td class="p-3" style="color:#10b981">${row.push}</td>
+                </tr>
+            `;
+        });
+    }
 
+    computeGraphBaseViewBox();
     renderSVGGraph();
     renderPDAGraph();
+    requestAnimationFrame(() => fitGraphToView());
 }
 
-function renderSVGGraph(activeState = null, activeTransition = null) {
+function computeGraphBaseViewBox() {
+    const data = automataData[currentAlphabet];
+    const nodes = Object.values(data.nodes);
+    const padding = 55;
+    const minX = Math.min(...nodes.map(n => n.x)) - padding - 25;
+    const minY = Math.min(...nodes.map(n => n.y)) - padding - 30;
+    const maxX = Math.max(...nodes.map(n => n.x)) + padding + 25;
+    const maxY = Math.max(...nodes.map(n => n.y)) + padding + 30;
+    graphBaseViewBox = { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+    graphViewBox = { ...graphBaseViewBox };
+    graphZoomLevel = 1;
+}
+
+function getEffectiveViewBox() {
+    if (!graphViewBox) computeGraphBaseViewBox();
+    const cx = graphViewBox.x + graphViewBox.w / 2;
+    const cy = graphViewBox.y + graphViewBox.h / 2;
+    const w = graphViewBox.w / graphZoomLevel;
+    const h = graphViewBox.h / graphZoomLevel;
+    return {
+        x: cx - w / 2,
+        y: cy - h / 2,
+        w,
+        h
+    };
+}
+
+function fitGraphToView() {
+    computeGraphBaseViewBox();
+    graphZoomLevel = 1;
+    renderSVGGraph(getTraceFrameState());
+}
+
+function adjustGraphZoom(factor) {
+    graphZoomLevel = Math.min(4, Math.max(0.35, graphZoomLevel * factor));
+    renderSVGGraph(getTraceFrameState());
+}
+
+function isTrapState(nodeId) {
+    return nodeId === 'T' || nodeId === 'Trap';
+}
+
+function getGraphTheme() {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return {
+        nodeFill: dark ? '#1e293b' : '#ffffff',
+        nodeStroke: dark ? '#64748b' : '#64748b',
+        acceptStroke: '#10b981',
+        trapFill: dark ? '#4c0519' : '#fff1f2',
+        trapStroke: '#f43f5e',
+        edge: dark ? '#94a3b8' : '#64748b',
+        label: dark ? '#cbd5e1' : '#475569',
+        text: dark ? '#f8fafc' : '#0f172a',
+        startLabel: '#6366f1'
+    };
+}
+
+function renderSVGGraph({ activeState = null, activeTransition = null } = {}) {
     const data = automataData[currentAlphabet];
     const container = document.getElementById('canvas-container');
     if (!container) return;
-    
+
     const viewWidth = 940;
     const viewHeight = currentAlphabet === 'ab' ? 420 : 500;
     const nodeRadius = 20;
+    const theme = getGraphTheme();
+    const vb = getEffectiveViewBox();
+    const viewBoxStr = `${vb.x} ${vb.y} ${vb.w} ${vb.h}`;
 
-    let svgHtml = `<svg width="${viewWidth}" height="${viewHeight}" viewBox="0 0 ${viewWidth} ${viewHeight}" class="mx-auto">`;
-    
+    let svgHtml = `<svg width="100%" height="${viewHeight}" viewBox="${viewBoxStr}" preserveAspectRatio="xMidYMid meet" class="mx-auto dfa-graph-svg">`;
+
     svgHtml += `
         <defs>
             <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 1 L 10 5 L 0 9 z" fill="#475569" />
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="${theme.edge}" />
             </marker>
-            <marker id="arrow-active" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981" />
+            <marker id="arrow-trace" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="${TRACE_HIGHLIGHT.edge}" />
             </marker>
         </defs>
     `;
@@ -385,30 +820,27 @@ function renderSVGGraph(activeState = null, activeTransition = null) {
 
             const nSrc = data.nodes[src];
             const nDest = data.nodes[dest];
-            
-            let isActiveTransition = false;
-            if (activeTransition && 
-                activeTransition.src === src && 
-                activeTransition.dest === dest && 
-                activeTransition.sym === sym) {
-                isActiveTransition = true;
-            }
 
-            const strokeColor = isActiveTransition ? '#10b981' : '#475569';
+            const isActiveTransition = activeTransition &&
+                activeTransition.src === src &&
+                activeTransition.dest === dest &&
+                activeTransition.sym === sym;
+
+            const strokeColor = isActiveTransition ? TRACE_HIGHLIGHT.edge : theme.edge;
             const strokeWidth = isActiveTransition ? '3' : '1.5';
-            const markerId = isActiveTransition ? 'url(#arrow-active)' : 'url(#arrow)';
+            const markerId = isActiveTransition ? 'url(#arrow-trace)' : 'url(#arrow)';
 
             if (src === dest) {
                 svgHtml += `
-                    <path d="M ${nSrc.x - 6} ${nSrc.y - 19} C ${nSrc.x - 25} ${nSrc.y - 50}, ${nSrc.x + 25} ${nSrc.y - 50}, ${nSrc.x + 6} ${nSrc.y - 19}" 
+                    <path d="M ${nSrc.x - 6} ${nSrc.y - 19} C ${nSrc.x - 25} ${nSrc.y - 50}, ${nSrc.x + 25} ${nSrc.y - 50}, ${nSrc.x + 6} ${nSrc.y - 19}"
                           fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}" marker-end="${markerId}" />
-                    <text x="${nSrc.x}" y="${nSrc.y - 44}" fill="${isActiveTransition ? '#34d399' : '#94a3b8'}" font-size="11" text-anchor="middle" font-family="monospace" font-weight="bold">${sym}</text>
+                    <text class="graph-label" x="${nSrc.x}" y="${nSrc.y - 44}" fill="${isActiveTransition ? TRACE_HIGHLIGHT.edge : theme.label}" font-size="11" text-anchor="middle" font-family="monospace" font-weight="bold">${sym}</text>
                 `;
             } else {
                 const dx = nDest.x - nSrc.x;
                 const dy = nDest.y - nSrc.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
-                
+
                 const x1 = nSrc.x + (dx / dist) * nodeRadius;
                 const y1 = nSrc.y + (dy / dist) * nodeRadius;
                 const x2 = nDest.x - (dx / dist) * nodeRadius;
@@ -419,18 +851,18 @@ function renderSVGGraph(activeState = null, activeTransition = null) {
                 let textY = (y1 + y2) / 2 - 7;
 
                 const isOverlappingLoop = (currentAlphabet === 'ab' && ((src === 'S8' && dest === 'S9') || (src === 'S9' && dest === 'S10') || (src === 'S10' && dest === 'S8'))) ||
-                                           (currentAlphabet === '01' && ((src === 'S7' && dest === 'S13') || (src === 'S13' && dest === 'S9') || (src === 'S9' && dest === 'S13') || (src === 'S6' && dest === 'S5') || (src === 'S5' && dest === 'S10')));
+                    (currentAlphabet === '01' && ((src === 'S7' && dest === 'S13') || (src === 'S13' && dest === 'S9') || (src === 'S9' && dest === 'S13') || (src === 'S6' && dest === 'S5') || (src === 'S5' && dest === 'S10')));
 
                 if (isOverlappingLoop || dist > 180) {
                     let bendMultiplier = 40;
                     if (src === 'S9' && dest === 'S13') bendMultiplier = -40;
                     if (src === 'S10' && dest === 'S8') bendMultiplier = -60;
-                    
+
                     const mx = (nSrc.x + nDest.x) / 2;
                     const my = (nSrc.y + nDest.y) / 2;
                     const px = -dy / dist * bendMultiplier;
                     const py = dx / dist * bendMultiplier;
-                    
+
                     pathD = `M ${x1} ${y1} Q ${mx + px} ${my + py} ${x2} ${y2}`;
                     textX = mx + px * 1.2;
                     textY = my + py * 1.2;
@@ -438,7 +870,7 @@ function renderSVGGraph(activeState = null, activeTransition = null) {
 
                 svgHtml += `
                     <path d="${pathD}" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}" marker-end="${markerId}" />
-                    <text x="${textX}" y="${textY}" fill="${isActiveTransition ? '#34d399' : '#cbd5e1'}" font-size="11" text-anchor="middle" font-family="monospace" font-weight="bold">${sym}</text>
+                    <text class="graph-label" x="${textX}" y="${textY}" fill="${isActiveTransition ? TRACE_HIGHLIGHT.edge : theme.label}" font-size="11" text-anchor="middle" font-family="monospace" font-weight="bold">${sym}</text>
                 `;
             }
         });
@@ -449,33 +881,97 @@ function renderSVGGraph(activeState = null, activeTransition = null) {
         const isAccept = data.acceptStates.includes(nodeId);
         const isStart = nodeId === data.startState;
         const isActiveNode = activeState === nodeId;
+        const isTrap = isTrapState(nodeId);
 
-        let fillStyle = isActiveNode ? '#064e3b' : (nodeId === 'T' || nodeId === 'Trap' ? '#311018' : '#1e293b');
-        let strokeStyle = isActiveNode ? '#10b981' : (isAccept ? '#10b981' : (nodeId === 'T' || nodeId === 'Trap' ? '#f43f5e' : '#475569'));
-        let textColor = isActiveNode ? '#ffffff' : '#f8fafc';
+        let fillStyle = isActiveNode ? TRACE_HIGHLIGHT.fill : (isTrap ? theme.trapFill : theme.nodeFill);
+        let strokeStyle = isActiveNode ? TRACE_HIGHLIGHT.stroke : (isAccept ? theme.acceptStroke : (isTrap ? theme.trapStroke : theme.nodeStroke));
+        let textColor = isActiveNode ? TRACE_HIGHLIGHT.text : theme.text;
 
+        const tooltipLines = getStateTransitionTooltip(data, nodeId);
+
+        // We remove the start arrow line entirely, as the start state is just a circle with a negative sign inside.
         svgHtml += `
-            <circle cx="${node.x}" cy="${node.y}" r="${nodeRadius}" fill="${fillStyle}" stroke="${strokeStyle}" stroke-width="${isActiveNode ? 3 : 2}" />
+            <g class="graph-node-group" data-node="${nodeId}" data-tooltip="${escapeHtmlAttr(tooltipLines)}">
+                <circle class="graph-node-hit" cx="${node.x}" cy="${node.y}" r="${nodeRadius + 4}" fill="transparent" stroke="none" />
+                <circle cx="${node.x}" cy="${node.y}" r="${nodeRadius}" fill="${fillStyle}" stroke="${strokeStyle}" stroke-width="${isActiveNode ? 3 : 2}" />
         `;
 
-        if (isAccept) {
+        const label = isTrap ? 'T' : nodeId;
+
+        if (isStart && isAccept) {
             svgHtml += `
-                <circle cx="${node.x}" cy="${node.y}" r="16" fill="none" stroke="${strokeStyle}" stroke-width="1.2" />
+                <text class="graph-label" x="${node.x}" y="${node.y - 3}" fill="#10b981" font-size="14" font-weight="bold" text-anchor="middle" font-family="sans-serif">±</text>
+                <text class="graph-label" x="${node.x}" y="${node.y + 9}" fill="${textColor}" font-size="10" font-weight="bold" text-anchor="middle" font-family="monospace">${label}</text>
             `;
-            svgHtml += `<text x="${node.x}" y="${node.y - 8}" fill="${textColor}" font-size="9" text-anchor="middle">+</text>`;
+        } else if (isStart) {
+            svgHtml += `
+                <text class="graph-label" x="${node.x}" y="${node.y - 3}" fill="${textColor}" font-size="15" font-weight="bold" text-anchor="middle" font-family="sans-serif">−</text>
+                <text class="graph-label" x="${node.x}" y="${node.y + 9}" fill="${textColor}" font-size="10" font-weight="bold" text-anchor="middle" font-family="monospace">${label}</text>
+            `;
+        } else if (isAccept) {
+            svgHtml += `
+                <text class="graph-label" x="${node.x}" y="${node.y - 3}" fill="#10b981" font-size="14" font-weight="bold" text-anchor="middle" font-family="sans-serif">+</text>
+                <text class="graph-label" x="${node.x}" y="${node.y + 9}" fill="${textColor}" font-size="10" font-weight="bold" text-anchor="middle" font-family="monospace">${label}</text>
+            `;
+        } else {
+            svgHtml += `
+                <text class="graph-label" x="${node.x}" y="${node.y + 4}" fill="${textColor}" font-size="11" font-weight="bold" text-anchor="middle" font-family="monospace">${label}</text>
+            `;
         }
 
-        svgHtml += `
-            <text x="${node.x}" y="${isAccept ? node.y + 5 : node.y + 4}" fill="${textColor}" font-size="11" font-weight="bold" text-anchor="middle" font-family="monospace">${nodeId}</text>
-        `;
-
-        if (isStart) {
-            svgHtml += `<text x="${node.x}" y="${node.y - 24}" fill="${isActiveNode ? '#34d399' : '#6366f1'}" font-size="9" font-weight="bold" text-anchor="middle">START</text>`;
-        }
+        svgHtml += `</g>`;
     });
 
     svgHtml += `</svg>`;
     container.innerHTML = svgHtml;
+}
+
+function escapeHtmlAttr(str) {
+    return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+function getStateTransitionTooltip(data, nodeId) {
+    const trans = data.transitions[nodeId];
+    if (!trans || !Object.keys(trans).length) return `${nodeId}: (no outgoing transitions)`;
+    const parts = Object.keys(trans).map(sym => `on ${sym} → ${trans[sym]}`);
+    return `${nodeId}: ${parts.join(', ')}`;
+}
+
+function onGraphMouseMove(e) {
+    if (isDraggingGraph) {
+        const container = document.getElementById('canvas-container');
+        const effectiveViewBox = getEffectiveViewBox();
+        const ratio = effectiveViewBox.w / container.clientWidth;
+
+        const dx = (e.clientX - dragStartX) * ratio;
+        const dy = (e.clientY - dragStartY) * ratio;
+
+        graphViewBox.x = startViewBoxX - dx;
+        graphViewBox.y = startViewBoxY - dy;
+
+        renderSVGGraph(getTraceFrameState());
+        hideGraphTooltip();
+        return;
+    }
+
+    const target = e.target.closest('[data-tooltip]');
+    const tooltip = document.getElementById('graph-tooltip');
+    const panel = document.querySelector('.graph-panel');
+    if (!target || !tooltip || !panel) {
+        hideGraphTooltip();
+        return;
+    }
+    const text = target.getAttribute('data-tooltip');
+    tooltip.textContent = text;
+    tooltip.classList.remove('hidden');
+    const panelRect = panel.getBoundingClientRect();
+    tooltip.style.left = `${e.clientX - panelRect.left + 12}px`;
+    tooltip.style.top = `${e.clientY - panelRect.top + 12}px`;
+}
+
+function hideGraphTooltip() {
+    const tooltip = document.getElementById('graph-tooltip');
+    if (tooltip) tooltip.classList.add('hidden');
 }
 
 function renderPDAGraph() {
@@ -483,15 +979,16 @@ function renderPDAGraph() {
     const container = document.getElementById('pda-canvas-container');
     if (!container) return;
 
-    const viewWidth = 860;
-    const viewHeight = 560;
+    const viewWidth = 840;
+    const viewHeight = 480;
+    const theme = getGraphTheme();
 
-    let pdaSvgHtml = `<svg width="${viewWidth}" height="${viewHeight}" viewBox="0 0 ${viewWidth} ${viewHeight}" class="mx-auto">`;
-    
+    let pdaSvgHtml = `<svg width="100%" height="${viewHeight}" viewBox="0 0 ${viewWidth} ${viewHeight}" preserveAspectRatio="xMidYMid meet" class="mx-auto">`;
+
     pdaSvgHtml += `
         <defs>
             <marker id="pda-arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 1 L 10 5 L 0 9 z" fill="#475569" />
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="${theme.edge}" />
             </marker>
         </defs>
     `;
@@ -499,7 +996,6 @@ function renderPDAGraph() {
     data.pdaLines.forEach(line => {
         const fromBlock = data.pdaBlocks.find(b => b.id === line.from);
         const toBlock = data.pdaBlocks.find(b => b.id === line.to);
-        
         if (!fromBlock || !toBlock) return;
 
         const getSideCoord = (block, side) => {
@@ -521,12 +1017,9 @@ function renderPDAGraph() {
 
         const p1 = getSideCoord(fromBlock, line.sideFrom);
         const p2 = getSideCoord(toBlock, line.sideTo);
-        
-        let pathD = line.isCustomPath ? line.path : `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y}`;
+        const pathD = line.isCustomPath ? line.path : `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y}`;
 
-        pdaSvgHtml += `
-            <path d="${pathD}" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#pda-arrow)" stroke-dasharray="${line.label === 'ε' ? '4 4' : 'none'}" />
-        `;
+        pdaSvgHtml += `<path d="${pathD}" fill="none" stroke="${theme.edge}" stroke-width="2" marker-end="url(#pda-arrow)" stroke-dasharray="${line.label === 'ε' ? '4 4' : 'none'}" />`;
 
         if (line.label) {
             let tx = (p1.x + p2.x) / 2;
@@ -543,37 +1036,26 @@ function renderPDAGraph() {
                     }
                 }
             }
-            pdaSvgHtml += `
-                <text x="${tx}" y="${ty}" fill="#f59e0b" font-size="10" font-family="monospace" font-weight="bold" text-anchor="middle">${line.label}</text>
-            `;
+            pdaSvgHtml += `<text class="graph-label" x="${tx}" y="${ty}" fill="#d97706" font-size="12" font-family="monospace" font-weight="bold" text-anchor="middle">${line.label}</text>`;
         }
     });
 
     data.pdaBlocks.forEach(block => {
         if (block.type === 'rect') {
-            let strokeColor = '#475569';
-            let fillColor = '#1e293b';
-            if (block.label === 'Accept') { strokeColor = '#10b981'; fillColor = '#064e3b'; }
-            if (block.label === 'Reject') { strokeColor = '#f43f5e'; fillColor = '#4c0519'; }
-            if (block.label === 'Push' || block.label === 'Start') { strokeColor = '#6366f1'; fillColor = '#1e3a8a'; }
+            let strokeColor = theme.nodeStroke;
+            let fillColor = theme.nodeFill;
+            if (block.label === 'Accept') { strokeColor = theme.acceptStroke; fillColor = document.documentElement.getAttribute('data-theme') === 'dark' ? '#064e3b' : '#ecfdf5'; }
+            if (block.label === 'Reject') { strokeColor = theme.trapStroke; fillColor = theme.trapFill; }
 
             pdaSvgHtml += `
                 <rect x="${block.x}" y="${block.y}" width="${block.w}" height="${block.h}" rx="6" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2" />
-                <text x="${block.x + block.w / 2}" y="${block.y + block.h / 2 + 4}" fill="#f8fafc" font-size="12" font-weight="semibold" font-family="sans-serif" text-anchor="middle">${block.label}</text>
+                <text class="graph-label" x="${block.x + block.w / 2}" y="${block.y + block.h / 2 + 4}" fill="${theme.text}" font-size="12" font-weight="semibold" font-family="sans-serif" text-anchor="middle">${block.label}</text>
             `;
         } else if (block.type === 'diamond') {
             const points = `${block.x},${block.y - block.h / 2} ${block.x + block.w / 2},${block.y} ${block.x},${block.y + block.h / 2} ${block.x - block.w / 2},${block.y}`;
-            let strokeColor = '#6366f1';
-            let fillColor = '#0f172a';
-            
-            if (['S8','S9','S10','S7','S11','S12','S13','S14','S15'].includes(block.label)) {
-                strokeColor = '#10b981';
-                fillColor = '#064e3b';
-            }
-
             pdaSvgHtml += `
-                <polygon points="${points}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="2" />
-                <text x="${block.x}" y="${block.y + 4}" fill="#f8fafc" font-size="11" font-weight="semibold" font-family="sans-serif" text-anchor="middle">${block.label}</text>
+                <polygon points="${points}" fill="${theme.nodeFill}" stroke="${theme.startLabel}" stroke-width="2" />
+                <text class="graph-label" x="${block.x}" y="${block.y + 4}" fill="${theme.text}" font-size="12" font-weight="semibold" font-family="sans-serif" text-anchor="middle">${block.label}</text>
             `;
         }
     });
@@ -582,119 +1064,176 @@ function renderPDAGraph() {
     container.innerHTML = pdaSvgHtml;
 }
 
-function clearAllInputs() {
-    if (activeAnimationTimeout) clearInterval(activeAnimationTimeout);
-    for(let i = 0; i < 10; i++) {
-        document.getElementById(`input-${i}`).value = '';
-        document.getElementById(`badge-${i}`).innerHTML = '';
-        document.getElementById(`path-${i}`).innerText = '';
-    }
-    renderSVGGraph();
-}
-
-function validateSingle(index, onCompleteCallback = null) {
-    if (activeAnimationTimeout) clearInterval(activeAnimationTimeout);
-    
-    const inputVal = document.getElementById(`input-${index}`).value.trim();
-    const badge = document.getElementById(`badge-${index}`);
-    const pathDisplay = document.getElementById(`path-${index}`);
-    
-    if (inputVal === '') {
-        badge.innerHTML = '<span class="inline-flex text-xs font-semibold px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">Empty Input</span>';
-        pathDisplay.innerText = '';
-        if(onCompleteCallback) onCompleteCallback();
-        return;
-    }
-
+function simulateDFA(inputVal) {
     const machine = automataData[currentAlphabet];
     let currentState = machine.startState;
-    
-    let animationFrames = [];
-    animationFrames.push({ node: currentState, transition: null });
-
+    const animationFrames = [{ node: currentState, transition: null }];
+    const pathStates = [currentState];
     let isValid = true;
-    let fullPathTraceString = [currentState];
+    let rejectAt = null;
+    let invalidChar = null;
 
     for (let i = 0; i < inputVal.length; i++) {
         const char = inputVal[i];
-        
         if (!machine.alphabet.includes(char)) {
             isValid = false;
-            fullPathTraceString.push(`[Invalid: '${char}']`);
+            invalidChar = char;
             break;
         }
-
         if (machine.transitions[currentState] && machine.transitions[currentState][char]) {
             const nextState = machine.transitions[currentState][char];
-            
             animationFrames.push({
                 node: nextState,
                 transition: { src: currentState, dest: nextState, sym: char }
             });
-            
             currentState = nextState;
-            fullPathTraceString.push(currentState);
-
-            if (currentState === 'T' || currentState === 'Trap') {
+            pathStates.push(currentState);
+            if (isTrapState(currentState)) {
                 isValid = false;
-                break; 
+                rejectAt = currentState;
+                break;
             }
         } else {
             isValid = false;
-            fullPathTraceString.push('T');
+            rejectAt = currentState;
+            pathStates.push('T');
             break;
         }
     }
 
     const isAccepted = isValid && machine.acceptStates.includes(currentState);
-    pathDisplay.innerText = "Processing Sequence Path Tracing...";
+    if (!isAccepted && !rejectAt && !invalidChar) {
+        rejectAt = currentState;
+    }
 
-    let currentFrameIndex = 0;
-    
-    activeAnimationTimeout = setInterval(() => {
-        if (currentFrameIndex >= animationFrames.length) {
-            clearInterval(activeAnimationTimeout);
-            
-            if (isAccepted) {
-                badge.innerHTML = '<span class="inline-flex items-center text-xs font-bold px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/20">✓ Valid String</span>';
+    return {
+        animationFrames,
+        pathStates,
+        finalState: currentState,
+        isAccepted,
+        rejectAt,
+        invalidChar,
+        pathString: pathStates.join(' → ')
+    };
+}
+
+function validateSingle(rowId) {
+    if (activeAnimationTimeout) clearInterval(activeAnimationTimeout);
+    stopTrace({ keepControls: false });
+
+    const inputEl = document.getElementById(`input-${rowId}`);
+    const badge = document.getElementById(`badge-${rowId}`);
+    const detail = document.getElementById(`detail-${rowId}`);
+    const validateBtn = document.getElementById(`action-validate-${rowId}`);
+    const inputVal = inputEl.value.trim();
+
+    if (inputVal === '') {
+        badge.innerHTML = '<span class="result-badge" style="opacity:0.7">Empty</span>';
+        detail.textContent = '';
+        return;
+    }
+
+    validateBtn.disabled = true;
+    badge.innerHTML = '<span class="result-badge"><span class="spinner"></span>Validating…</span>';
+    detail.textContent = '';
+
+    setTimeout(() => {
+        const result = simulateDFA(inputVal);
+        validateBtn.disabled = false;
+
+        if (result.isAccepted) {
+            badge.innerHTML = '<span class="result-badge result-badge-accepted">✓ Accepted</span>';
+            detail.textContent = `Path: ${result.pathString}`;
+        } else {
+            badge.innerHTML = '<span class="result-badge result-badge-rejected">✗ Rejected</span>';
+            if (result.invalidChar !== null) {
+                detail.textContent = `Invalid symbol '${result.invalidChar}'`;
             } else {
-                badge.innerHTML = '<span class="inline-flex items-center text-xs font-bold px-2.5 py-1 rounded-md bg-rose-500/10 text-rose-400 ring-1 ring-inset ring-rose-500/20">✗ Invalid String</span>';
+                const stateLabel = result.rejectAt || result.finalState;
+                detail.textContent = `Rejected at ${stateLabel}`;
             }
-            pathDisplay.innerText = "Path: " + fullPathTraceString.join(" → ");
-            
-            if (currentTab === 'dfa') {
-                renderSVGGraph(currentState, null);
-            }
-            
-            if (onCompleteCallback) onCompleteCallback();
+        }
+
+        // Log to sidebar history
+        addHistoryEntry(inputVal, result.isAccepted, result.animationFrames);
+
+        activeTrace.frames = result.animationFrames;
+        activeTrace.index = 0;
+        showTraceControls();
+        renderTraceStep();
+
+        if (currentTab === 'dfa') {
+            playTraceAnimation();
+        }
+    }, 280);
+}
+
+function showTraceControls() {
+    const controls = document.getElementById('trace-controls');
+    controls.classList.remove('hidden');
+    updateTraceControlsUI();
+}
+
+function stopTrace({ keepControls = true } = {}) {
+    if (activeAnimationTimeout) clearInterval(activeAnimationTimeout);
+    activeAnimationTimeout = null;
+    activeTrace.playing = false;
+    if (!keepControls) {
+        document.getElementById('trace-controls').classList.add('hidden');
+        activeTrace.frames = [];
+        activeTrace.index = 0;
+    }
+}
+
+function updateTraceControlsUI() {
+    const total = activeTrace.frames.length;
+    const idx = activeTrace.index;
+    document.getElementById('trace-step-label').textContent =
+        total ? `Step ${idx + 1} / ${total}` : 'Step 0 / 0';
+    document.getElementById('btn-trace-prev').disabled = idx <= 0;
+    document.getElementById('btn-trace-next').disabled = idx >= total - 1;
+    document.getElementById('btn-trace-play').textContent = activeTrace.playing ? '⏸ Pause' : '▶ Play';
+}
+
+function renderTraceStep() {
+    updateTraceControlsUI();
+    if (currentTab === 'dfa') {
+        renderSVGGraph(getTraceFrameState());
+    }
+}
+
+function stepTrace(delta) {
+    if (activeAnimationTimeout) clearInterval(activeAnimationTimeout);
+    activeTrace.playing = false;
+    const next = activeTrace.index + delta;
+    if (next < 0 || next >= activeTrace.frames.length) return;
+    activeTrace.index = next;
+    renderTraceStep();
+}
+
+function playTraceAnimation() {
+    if (!activeTrace.frames.length) return;
+
+    if (activeTrace.playing) {
+        activeTrace.playing = false;
+        if (activeAnimationTimeout) clearInterval(activeAnimationTimeout);
+        updateTraceControlsUI();
+        return;
+    }
+
+    activeTrace.playing = true;
+    updateTraceControlsUI();
+
+    activeAnimationTimeout = setInterval(() => {
+        if (activeTrace.index >= activeTrace.frames.length - 1) {
+            clearInterval(activeAnimationTimeout);
+            activeAnimationTimeout = null;
+            activeTrace.playing = false;
+            updateTraceControlsUI();
             return;
         }
-
-        const frame = animationFrames[currentFrameIndex];
-        if (currentTab === 'dfa') {
-            renderSVGGraph(frame.node, frame.transition);
-        }
-        
-        currentFrameIndex++;
-    }, 750);
+        activeTrace.index++;
+        renderTraceStep();
+    }, 600);
 }
 
-function validateAll() {
-    let rowIndex = 0;
-    
-    function runNextRowChain() {
-        if (rowIndex >= 10) return;
-        const val = document.getElementById(`input-${rowIndex}`).value.trim();
-        if (val !== '') {
-            validateSingle(rowIndex, () => {
-                rowIndex++;
-                setTimeout(runNextRowChain, 500); 
-            });
-        } else {
-            rowIndex++;
-            runNextRowChain();
-        }
-    }
-    
-    runNextRowChain();
-}
