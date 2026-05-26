@@ -308,7 +308,8 @@ let graphZoomLevel = 1;
 let activeTrace = {
     frames: [],
     index: 0,
-    playing: false
+    playing: false,
+    inputString: ''
 };
 
 const TRACE_HIGHLIGHT = { fill: '#78350f', stroke: '#f59e0b', edge: '#fbbf24', text: '#ffffff' };
@@ -378,6 +379,140 @@ function bindGlobalEvents() {
 
     document.getElementById('btn-finalize').addEventListener('click', toggleDockMode);
     document.getElementById('btn-clear-history').addEventListener('click', clearHistory);
+    document.getElementById('btn-toggle-generator').addEventListener('click', toggleGeneratorPanel);
+    document.getElementById('btn-run-generator').addEventListener('click', runAutoGenerator);
+    document.getElementById('computation-toggle').addEventListener('click', toggleComputationPanel);
+}
+
+function toggleComputationPanel() {
+    const body = document.getElementById('computation-body');
+    const chevron = document.getElementById('computation-chevron');
+    body.classList.toggle('hidden');
+    chevron.style.transform = body.classList.contains('hidden') ? 'rotate(-90deg)' : 'rotate(0deg)';
+}
+
+function toggleGeneratorPanel() {
+    const panel = document.getElementById('generator-panel');
+    panel.classList.toggle('hidden');
+}
+
+function runAutoGenerator() {
+    const minLen = Math.max(1, parseInt(document.getElementById('gen-min-len').value, 10) || 1);
+    const maxLen = Math.max(minLen, parseInt(document.getElementById('gen-max-len').value, 10) || 6);
+    const totalCount = parseInt(document.getElementById('gen-count').value, 10) || 6;
+    const status = document.getElementById('generator-status');
+
+    const machine = automataData[currentAlphabet];
+    const alphabet = machine.alphabet;
+
+    // We want roughly half accepted and half rejected
+    const acceptCount = Math.ceil(totalCount / 2);
+    const rejectCount = totalCount - acceptCount;
+
+    const acceptedStrings = new Set();
+    const rejectedStrings = new Set();
+
+    // Generate ACCEPTED strings by doing random walks and keeping those that land on accept states
+    let attempts = 0;
+    const maxAttempts = 5000;
+
+    while (acceptedStrings.size < acceptCount && attempts < maxAttempts) {
+        attempts++;
+        const len = minLen + Math.floor(Math.random() * (maxLen - minLen + 1));
+        const str = generateRandomString(alphabet, len);
+        const result = simulateDFA(str);
+        if (result.isAccepted && !acceptedStrings.has(str)) {
+            acceptedStrings.add(str);
+        }
+    }
+
+    // Try guided walk to accept states if random wasn't enough
+    if (acceptedStrings.size < acceptCount) {
+        const guided = generateGuidedAcceptedStrings(machine, minLen, maxLen, acceptCount - acceptedStrings.size, acceptedStrings);
+        guided.forEach(s => acceptedStrings.add(s));
+    }
+
+    // Generate REJECTED strings by random walks, keeping those that do NOT land on accept states
+    attempts = 0;
+    while (rejectedStrings.size < rejectCount && attempts < maxAttempts) {
+        attempts++;
+        const len = minLen + Math.floor(Math.random() * (maxLen - minLen + 1));
+        const str = generateRandomString(alphabet, len);
+        const result = simulateDFA(str);
+        if (!result.isAccepted && !rejectedStrings.has(str) && !acceptedStrings.has(str)) {
+            rejectedStrings.add(str);
+        }
+    }
+
+    // Combine and shuffle
+    const allStrings = [...acceptedStrings, ...rejectedStrings];
+    shuffleArray(allStrings);
+
+    // Clear existing rows and populate new ones
+    clearAllTestRows();
+    const firstInput = document.getElementById(`input-${testRowIds[0]}`);
+    if (firstInput && allStrings.length > 0) {
+        firstInput.value = allStrings[0];
+    }
+    for (let i = 1; i < allStrings.length; i++) {
+        addTestRow();
+        const lastId = testRowIds[testRowIds.length - 1];
+        const inp = document.getElementById(`input-${lastId}`);
+        if (inp) inp.value = allStrings[i];
+    }
+
+    // Show status
+    status.classList.remove('hidden');
+    status.textContent = `Generated ${acceptedStrings.size} accepted + ${rejectedStrings.size} rejected string${allStrings.length !== 1 ? 's' : ''} (length ${minLen}–${maxLen}). Click "Validate All Cases" to test them.`;
+}
+
+function generateRandomString(alphabet, length) {
+    let s = '';
+    for (let i = 0; i < length; i++) {
+        s += alphabet[Math.floor(Math.random() * alphabet.length)];
+    }
+    return s;
+}
+
+function generateGuidedAcceptedStrings(machine, minLen, maxLen, needed, existing) {
+    // BFS/DFS from start state, collecting paths that reach accept states within length range
+    const results = [];
+    const queue = [{ state: machine.startState, path: '' }];
+
+    while (queue.length > 0 && results.length < needed) {
+        const { state, path } = queue.shift();
+
+        if (path.length >= minLen && path.length <= maxLen && machine.acceptStates.includes(state) && !existing.has(path)) {
+            results.push(path);
+            if (results.length >= needed) break;
+        }
+
+        if (path.length >= maxLen) continue;
+
+        // Expand transitions in random order for variety
+        const syms = [...machine.alphabet];
+        shuffleArray(syms);
+        for (const sym of syms) {
+            if (machine.transitions[state] && machine.transitions[state][sym]) {
+                const nextState = machine.transitions[state][sym];
+                if (!isTrapState(nextState)) {
+                    queue.push({ state: nextState, path: path + sym });
+                }
+            }
+        }
+
+        // Cap the queue to prevent memory issues with large graphs
+        if (queue.length > 10000) queue.length = 10000;
+    }
+
+    return results;
+}
+
+function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
 }
 
 function addHistoryEntry(inputStr, accepted, frames) {
@@ -429,6 +564,7 @@ function replayTrace(historyIdx) {
     activeTrace.frames = entry.frames;
     activeTrace.index = 0;
     activeTrace.playing = false;
+    activeTrace.inputString = entry.inputStr;
     showTraceControls();
     renderTraceStep();
     if (currentTab === 'dfa') playTraceAnimation();
@@ -598,6 +734,7 @@ function validateAllRows() {
         if (i >= ids.length) return;
         const id = ids[i++];
 
+        const rowEl = document.querySelector(`[data-row-id="${id}"]`);
         const inputEl = document.getElementById(`input-${id}`);
         const badge = document.getElementById(`badge-${id}`);
         const detail = document.getElementById(`detail-${id}`);
@@ -609,6 +746,7 @@ function validateAllRows() {
             return;
         }
 
+        if (rowEl) rowEl.classList.add('testing-active');
         if (validateBtn) validateBtn.disabled = true;
         if (badge) badge.innerHTML = '<span class="result-badge"><span class="spinner"></span>Validating…</span>';
         if (detail) detail.textContent = '';
@@ -629,6 +767,7 @@ function validateAllRows() {
 
             activeTrace.frames = result.animationFrames;
             activeTrace.index = 0;
+            activeTrace.inputString = inputVal;
             showTraceControls();
             renderTraceStep();
 
@@ -643,13 +782,15 @@ function validateAllRows() {
                         activeAnimationTimeout = null;
                         activeTrace.playing = false;
                         updateTraceControlsUI();
-                        setTimeout(runNext, 400);
+                        if (rowEl) rowEl.classList.remove('testing-active');
+                        setTimeout(runNext, 1200);
                         return;
                     }
                     activeTrace.index++;
                     renderTraceStep();
-                }, 600);
+                }, 900);
             } else {
+                if (rowEl) rowEl.classList.remove('testing-active');
                 runNext();
             }
         }, 280);
@@ -1180,6 +1321,7 @@ function validateSingle(rowId) {
 
         activeTrace.frames = result.animationFrames;
         activeTrace.index = 0;
+        activeTrace.inputString = inputVal;
         showTraceControls();
         renderTraceStep();
 
@@ -1193,6 +1335,15 @@ function showTraceControls() {
     const controls = document.getElementById('trace-controls');
     controls.classList.remove('hidden');
     updateTraceControlsUI();
+    buildComputationTable();
+    document.getElementById('computation-panel').classList.remove('hidden');
+
+    const badge = document.getElementById('active-string-badge');
+    const display = document.getElementById('active-string-display');
+    if (badge && display) {
+        display.textContent = activeTrace.inputString === '' ? '(empty)' : activeTrace.inputString;
+        badge.classList.remove('hidden');
+    }
 }
 
 function stopTrace({ keepControls = true } = {}) {
@@ -1201,8 +1352,14 @@ function stopTrace({ keepControls = true } = {}) {
     activeTrace.playing = false;
     if (!keepControls) {
         document.getElementById('trace-controls').classList.add('hidden');
+        document.getElementById('computation-panel').classList.add('hidden');
+        
+        const badge = document.getElementById('active-string-badge');
+        if (badge) badge.classList.add('hidden');
+
         activeTrace.frames = [];
         activeTrace.index = 0;
+        activeTrace.inputString = '';
     }
 }
 
@@ -1221,6 +1378,114 @@ function renderTraceStep() {
     if (currentTab === 'dfa') {
         renderSVGGraph(getTraceFrameState());
     }
+    updateComputationHighlight();
+}
+
+function buildComputationTable() {
+    const tbody = document.getElementById('computation-tbody');
+    const stringBar = document.getElementById('computation-string');
+    const verdict = document.getElementById('computation-verdict');
+    const frames = activeTrace.frames;
+    const inputStr = activeTrace.inputString || '';
+    const machine = automataData[currentAlphabet];
+
+    // Build the string character bar
+    if (inputStr.length === 0) {
+        stringBar.innerHTML = '<span class="text-xs app-muted italic">(empty string)</span>';
+    } else {
+        stringBar.innerHTML = inputStr.split('').map((ch, i) =>
+            `<span class="computation-char" data-char-idx="${i}">${ch}</span>`
+        ).join('');
+    }
+
+    // Determine final verdict
+    const lastFrame = frames[frames.length - 1];
+    const finalState = lastFrame ? lastFrame.node : null;
+    const isAccepted = finalState && machine.acceptStates.includes(finalState);
+    if (isAccepted) {
+        verdict.innerHTML = '<span class="comp-status comp-status-accepted">Accepted</span>';
+    } else {
+        verdict.innerHTML = '<span class="comp-status comp-status-rejected">Rejected</span>';
+    }
+
+    // Build table rows — one per frame
+    let html = '';
+    for (let i = 0; i < frames.length; i++) {
+        const frame = frames[i];
+        const trans = frame.transition;
+
+        if (i === 0) {
+            // Initial state row (no transition yet)
+            const stateLabel = frame.node;
+            const isAcceptState = machine.acceptStates.includes(stateLabel);
+            html += `<tr data-comp-row="${i}">
+                <td class="p-3 text-center font-semibold">0</td>
+                <td class="p-3 text-center app-muted">—</td>
+                <td class="p-3 font-bold">${stateLabel}</td>
+                <td class="p-3 text-center"></td>
+                <td class="p-3 app-muted">—</td>
+                <td class="p-3 text-center"><span class="comp-status comp-status-start">Start</span></td>
+            </tr>`;
+        } else {
+            const sym = trans ? trans.sym : '?';
+            const fromState = trans ? trans.src : '?';
+            const toState = trans ? trans.dest : frame.node;
+            const isLast = i === frames.length - 1;
+
+            let statusHtml;
+            if (isLast && isAccepted) {
+                statusHtml = '<span class="comp-status comp-status-accepted">Accept</span>';
+            } else if (isLast && !isAccepted) {
+                statusHtml = '<span class="comp-status comp-status-rejected">Reject</span>';
+            } else {
+                statusHtml = '<span class="comp-status comp-status-transition">δ</span>';
+            }
+
+            html += `<tr data-comp-row="${i}">
+                <td class="p-3 text-center font-semibold">${i}</td>
+                <td class="p-3 text-center"><span style="color:#d97706; font-weight:700;">${sym}</span></td>
+                <td class="p-3 font-bold">${fromState}</td>
+                <td class="p-3 text-center comp-arrow">→</td>
+                <td class="p-3 font-bold">${toState}</td>
+                <td class="p-3 text-center">${statusHtml}</td>
+            </tr>`;
+        }
+    }
+
+    tbody.innerHTML = html;
+    updateComputationHighlight();
+}
+
+function updateComputationHighlight() {
+    const idx = activeTrace.index;
+    const frames = activeTrace.frames;
+    if (!frames.length) return;
+
+    // Highlight table rows
+    const rows = document.querySelectorAll('#computation-tbody tr');
+    rows.forEach((row, i) => {
+        row.classList.remove('comp-row-past', 'comp-row-active', 'comp-row-future');
+        if (i < idx) row.classList.add('comp-row-past');
+        else if (i === idx) row.classList.add('comp-row-active');
+        else row.classList.add('comp-row-future');
+    });
+
+    // Auto-scroll the active row into view
+    const activeRow = document.querySelector(`#computation-tbody tr[data-comp-row="${idx}"]`);
+    if (activeRow) {
+        activeRow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+
+    // Highlight string characters
+    // Frame 0 = start (no char read yet), Frame 1 = first char read, etc.
+    const chars = document.querySelectorAll('#computation-string .computation-char');
+    chars.forEach((ch, i) => {
+        ch.classList.remove('char-past', 'char-active', 'char-future');
+        const charStep = i + 1; // char at index i is read at frame i+1
+        if (charStep < idx) ch.classList.add('char-past');
+        else if (charStep === idx) ch.classList.add('char-active');
+        else ch.classList.add('char-future');
+    });
 }
 
 function stepTrace(delta) {
@@ -1255,5 +1520,5 @@ function playTraceAnimation() {
         }
         activeTrace.index++;
         renderTraceStep();
-    }, 600);
+    }, 900);
 }

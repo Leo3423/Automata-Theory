@@ -187,3 +187,28 @@
 - All changes committed to a new dedicated branch: **`tims-branch`**
 - Pushed to `origin/tims-branch` on GitHub.
 - Old `landing-page-ui` branch deleted after rename.
+
+---
+
+## 19. Core Academic Features: Auto-Generator & Computation Trace
+
+- **Auto-Generate Test Cases Panel:**
+  - Added a collapsible panel in the Sequence Tester triggered by a new "Auto-Generate" button.
+  - Implemented an algorithm to dynamically walk the DFA and generate valid/invalid string paths.
+  - Mixes random walks and guided BFS to guarantee an equal split of accepted and rejected strings within user-defined length ranges.
+  - Automatically populates the test rows, ready for batch validation.
+- **Computation Breakdown Panel (δ-Table):**
+  - Designed a collapsible breakdown panel that sits below the trace controls.
+  - Displays the input string with dynamic character highlighting indicating the current read position.
+  - Dynamically builds a step-by-step trace table (`Step # | Symbol | Current State → Next State | Status`) that updates in real-time as the graph animation plays.
+  - Added a pulsing "Validating: <string>" badge to the graph header so the active string is always visible.
+
+---
+
+## 20. Trace Animation UX Improvements
+
+- **Pacing & Synchronization:**
+  - Slowed the animation steps (from 600ms to 900ms) to make tracing easier to follow visually.
+  - Increased the gap between batch tests in "Validate All Cases" to 1200ms.
+- **Active Row Highlighting:**
+  - Added a bright amber glow (`.testing-active`) to the sequence tester row currently being processed, making it crystal clear which input string matches the graph animation.

@@ -118,9 +118,19 @@
 
                     <!-- Graph Card -->
                     <div id="dfa-graph-card" class="panel-card rounded-2xl border p-6 shadow-sm flex flex-col transition-ui">
-                        <div class="mb-4">
-                            <h3 class="text-lg font-bold">Live DFA Transition Graph Viewer</h3>
-                            <p class="text-sm app-muted">Hover a state to see outgoing transitions. Validate a string to trace its path.</p>
+                        <div class="mb-4 flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                            <div>
+                                <h3 class="text-lg font-bold">Live DFA Transition Graph Viewer</h3>
+                                <p class="text-sm app-muted">Hover a state to see outgoing transitions. Validate a string to trace its path.</p>
+                            </div>
+                            <div id="active-string-badge" class="hidden flex items-center gap-2 px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 transition-ui">
+                                <span class="relative flex h-2 w-2">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                                </span>
+                                <span class="text-[10px] font-bold uppercase tracking-wider">Validating:</span>
+                                <span id="active-string-display" class="font-mono text-xs font-bold"></span>
+                            </div>
                         </div>
 
                         <div class="graph-panel rounded-xl border relative overflow-hidden">
@@ -176,6 +186,38 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Computation Breakdown Table (Collapsible) -->
+                        <div id="computation-panel" class="computation-panel hidden mt-4 rounded-xl border overflow-hidden transition-ui">
+                            <div class="computation-header flex items-center justify-between px-4 py-3 cursor-pointer select-none" id="computation-toggle" title="Toggle computation breakdown">
+                                <div class="flex items-center gap-2">
+                                    <svg id="computation-chevron" class="w-4 h-4 shrink-0 transition-transform duration-200" style="color: var(--app-accent); transform: rotate(-90deg);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                    <span class="text-xs font-bold uppercase tracking-wider">Computation Breakdown</span>
+                                </div>
+                                <div id="computation-verdict" class="text-xs font-bold"></div>
+                            </div>
+                            <div id="computation-body" class="hidden">
+                                <div class="computation-string-bar px-4 py-2 border-t border-b app-border flex items-center gap-2 flex-wrap">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider app-muted">Input:</span>
+                                    <div id="computation-string" class="font-mono text-sm font-semibold flex gap-0.5 flex-wrap"></div>
+                                </div>
+                                <div class="overflow-x-auto computation-table-scroll">
+                                    <table class="w-full text-left border-collapse text-sm computation-table">
+                                        <thead>
+                                            <tr class="app-table-head">
+                                                <th class="p-3 text-center w-16">Step</th>
+                                                <th class="p-3 text-center w-24">Symbol</th>
+                                                <th class="p-3">Current State</th>
+                                                <th class="p-3 text-center w-10"></th>
+                                                <th class="p-3">Next State</th>
+                                                <th class="p-3 text-center w-24">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="computation-tbody" class="divide-y font-mono app-table-body"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Sequence Tester Card -->
@@ -204,6 +246,41 @@
                             <button type="button" id="btn-validate-all" class="px-4 py-2 font-semibold rounded-xl text-sm transition-ui focus-ring text-white" style="background: var(--app-accent);">
                                 Validate All Cases
                             </button>
+                            <button type="button" id="btn-toggle-generator" class="px-4 py-2 font-semibold rounded-xl text-sm transition-ui focus-ring text-white" style="background: #7c3aed;">
+                                <svg class="inline-block w-4 h-4 mr-1 -mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                                Auto-Generate
+                            </button>
+                        </div>
+
+                        <!-- Auto-Generate Panel -->
+                        <div id="generator-panel" class="generator-panel hidden mt-4 p-5 rounded-xl border app-border transition-ui" style="animation: rowIn 180ms ease;">
+                            <div class="flex items-center gap-2 mb-4">
+                                <svg class="w-5 h-5 shrink-0" style="color: #7c3aed;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                                <span class="text-sm font-bold">Auto-Generate Test Cases</span>
+                            </div>
+                            <div class="flex flex-wrap items-end gap-4">
+                                <div class="flex flex-col gap-1">
+                                    <label for="gen-min-len" class="text-[10px] font-bold uppercase tracking-wider app-muted">Min Length</label>
+                                    <input type="number" id="gen-min-len" min="1" max="20" value="1" class="generator-input" />
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <label for="gen-max-len" class="text-[10px] font-bold uppercase tracking-wider app-muted">Max Length</label>
+                                    <input type="number" id="gen-max-len" min="1" max="20" value="6" class="generator-input" />
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <label for="gen-count" class="text-[10px] font-bold uppercase tracking-wider app-muted">Count</label>
+                                    <select id="gen-count" class="generator-input" style="appearance: auto; cursor: pointer;">
+                                        <option value="4">4 strings</option>
+                                        <option value="6" selected>6 strings</option>
+                                        <option value="8">8 strings</option>
+                                        <option value="10">10 strings</option>
+                                    </select>
+                                </div>
+                                <button type="button" id="btn-run-generator" class="px-5 py-2.5 font-bold rounded-xl text-sm transition-ui focus-ring text-white" style="background: #7c3aed;">
+                                    Generate
+                                </button>
+                            </div>
+                            <p id="generator-status" class="text-xs app-muted mt-3 hidden"></p>
                         </div>
                     </div>
 
