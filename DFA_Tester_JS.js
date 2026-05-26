@@ -741,9 +741,7 @@ function updateWorkspace() {
                 <tr class="transition-ui">
                     <td class="p-3 font-semibold">${row.curr}</td>
                     <td class="p-3" style="color:#d97706">${row.input}</td>
-                    <td class="p-3" style="color:#f43f5e">${row.pop}</td>
                     <td class="p-3" style="color:#6366f1">${row.next}</td>
-                    <td class="p-3" style="color:#10b981">${row.push}</td>
                 </tr>
             `;
         });
