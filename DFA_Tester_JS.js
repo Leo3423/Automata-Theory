@@ -33,7 +33,7 @@ const automataData = {
             'S9':  { x: 920, y: 380 },
             'S10': { x: 1060, y: 240 }
         },
-        cfg: `S  → A B C D\nA  → aa | bb\nB  → aB | bB | ε\nC  → a | b | ab | ba\nD  → aD | bD | aaD | bbD | ε`,
+        cfg: `S -> A B C D E F G\nA -> aa | bb\nB -> aB | bB | λ \nC -> a | b | ab | ba\nD -> aD | bD | abD | baD | λ \nE -> aaE | babE | λ \nF -> a | b | aa\nG -> a | b | bb | aa`,
         
         pda: [
             { curr: 'START', input: 'Δ' , next: 'R0'  },
@@ -166,7 +166,7 @@ const automataData = {
             'S13': { x: 920, y: 280 },
             'S14': { x: 1080, y: 280 }
         },
-        cfg: `S  → X Y Z\nX  → 101 | 111X | 100 | ε\nY  → 1Y | 0Y | 01Y | ε\nZ  → 111 | 000 | 101`,
+        cfg: `S → X Y Z W\nX → 101 | 100 | 111X | U\nU → 1U | 0U | 11U | λ \nY → 1Y | 0Y | 01Y | λ \nZ → 111 | 000 | 101\nW → 1W | 0W | λ `,
         
         pda: [
             { curr: 'START', input: 'Δ' , next: 'R0'  },
@@ -1182,7 +1182,7 @@ function renderPDAGraph() {
         const p2 = getSideCoord(toBlock, line.sideTo);
         const pathD = line.isCustomPath ? line.path : `M ${p1.x} ${p1.y} L ${p2.x} ${p2.y}`;
 
-        pdaSvgHtml += `<path d="${pathD}" fill="none" stroke="${theme.edge}" stroke-width="2" marker-end="url(#pda-arrow)" stroke-dasharray="${line.label === 'ε' ? '4 4' : 'none'}" />`;
+        pdaSvgHtml += `<path d="${pathD}" fill="none" stroke="${theme.edge}" stroke-width="2" marker-end="url(#pda-arrow)" stroke-dasharray="${line.label === 'λ ' ? '4 4' : 'none'}" />`;
 
         if (line.label) {
             let tx = (p1.x + p2.x) / 2;
