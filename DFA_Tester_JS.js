@@ -263,10 +263,10 @@ const automataData = {
             { from: 'R0', to: 'R2', sideFrom: 'bottomRight', sideTo: 'left', label: '0 ' },
             { from: 'R1', to: 'R3', sideFrom: 'right', sideTo: 'left', label: '1 ' },
             { from: 'R1', to: 'R4', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '0 ' },
-            { from: 'R2', to: 'R5', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '1 ' },
+            { from: 'R2', to: 'R5', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '1 ', isCustomPath: true, path: 'M 282.5 360 C 250 420, 350 510, 422.5 540', labelX: 295, labelY: 450 },
             { from: 'R2', to: 'R6', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '0 ' },
             { from: 'R3', to: 'R7', sideFrom: 'right', sideTo: 'left', label: '1 ' },
-            { from: 'R3', to: 'R8', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '0 ' },
+            { from: 'R3', to: 'R8', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '0 ', isCustomPath: true, path: 'M 440 170 C 400 300, 480 480, 562.5 540', labelX: 415, labelY: 340 },
             { from: 'R4', to: 'R9', sideFrom: 'right', sideTo: 'left', label: '1 ' },
             { from: 'R4', to: 'R6', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '0 ' },
             { from: 'R5', to: 'R10', sideFrom: 'bottom', sideTo: 'top', label: '1 ', labelX: 425, labelY: 600 },
@@ -294,19 +294,19 @@ const automataData = {
             { from: 'R7', to: 'ACC', sideFrom: 'top', sideTo: 'left', label: 'Δ ', isCustomPath: true, path: 'M 720 130 L 720 65 L 1140 65' },
             { from: 'R15', to: 'ACC', sideFrom: 'top', sideTo: 'left', label: 'Δ ', isCustomPath: true, path: 'M 860 130 L 860 65 L 1140 65' },
             { from: 'R13', to: 'ACC', sideFrom: 'top', sideTo: 'left', label: 'Δ ', isCustomPath: true, path: 'M 1000 130 L 1000 65 L 1140 65' },
-            { from: 'R14', to: 'ACC', sideFrom: 'top', sideTo: 'bottom', label: 'Δ ', isCustomPath: true, path: 'M 1140 130 L 1140 95 L 1175 95 L 1175 80', labelX: 1125, labelY: 100 },
+            { from: 'R14', to: 'ACC', sideFrom: 'left', sideTo: 'bottom', label: 'Δ ' },
             { from: 'R9', to: 'ACC', sideFrom: 'right', sideTo: 'right', label: 'Δ ', isCustomPath: true, path: 'M 1175 350 L 1260 350 L 1260 65 L 1210 65' },
             { from: 'R11', to: 'ACC', sideFrom: 'right', sideTo: 'right', label: 'Δ ', isCustomPath: true, path: 'M 1040 450 L 1260 450 L 1260 65 L 1210 65' },
-            { from: 'R0', to: 'REJ1', sideFrom: 'topRight', sideTo: 'bottom', label: 'Δ ' },
-            { from: 'R1', to: 'REJ1', sideFrom: 'topLeft', sideTo: 'right', label: 'Δ ' },
-            { from: 'R3', to: 'REJ1', sideFrom: 'topLeft', sideTo: 'right', label: 'Δ ' },
+            { from: 'R0', to: 'REJ1', sideFrom: 'topRight', sideTo: 'bottom', label: 'Δ ', isCustomPath: true, path: 'M 177.5 240 C 180 160, 220 120, 270 115', labelX: 200, labelY: 160 },
+            { from: 'R1', to: 'REJ1', sideFrom: 'topLeft', sideTo: 'bottom', label: 'Δ ' },
+            { from: 'R3', to: 'REJ1', sideFrom: 'topLeft', sideTo: 'bottom', label: 'Δ ' },
             { from: 'R2', to: 'REJ2', sideFrom: 'bottomLeft', sideTo: 'top', label: 'Δ ' },
             { from: 'R5', to: 'REJ2', sideFrom: 'left', sideTo: 'right', label: 'Δ ' },
             { from: 'R10', to: 'REJ2', sideFrom: 'topLeft', sideTo: 'bottom', label: 'Δ ' },
-            { from: 'R4', to: 'REJ3', sideFrom: 'bottomRight', sideTo: 'top', label: 'Δ ' },
+            { from: 'R4', to: 'REJ1', sideFrom: 'top', sideTo: 'right', label: 'Δ ', isCustomPath: true, path: 'M 580 330 L 580 100 L 305 100', labelX: 565, labelY: 200 },
             { from: 'R6', to: 'REJ3', sideFrom: 'bottomRight', sideTo: 'left', label: 'Δ ' },
             { from: 'R8', to: 'REJ3', sideFrom: 'right', sideTo: 'left', label: 'Δ ' },
-            { from: 'R12', to: 'REJ3', sideFrom: 'bottom', sideTo: 'top', label: 'Δ ' }
+            { from: 'R12', to: 'REJ3', sideFrom: 'bottom', sideTo: 'top', label: 'Δ ', labelX: 780, labelY: 390 }
         ]
     }
 };
