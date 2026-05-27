@@ -237,9 +237,9 @@ const automataData = {
         pdaBlocks: [
             { id: 'START', type: 'rect', label: 'START', x: 160, y: 100, w: 60, h: 30 },
             { id: 'ACC', type: 'rect', label: 'ACCEPT', x: 1140, y: 50, w: 70, h: 30 },
-            { id: 'REJ1', type: 'rect', label: 'REJECT', x: 265, y: 235, w: 70, h: 30 },
-            { id: 'REJ2', type: 'rect', label: 'REJECT', x: 685, y: 335, w: 70, h: 30 },
-            { id: 'REJ3', type: 'rect', label: 'REJECT', x: 545, y: 635, w: 70, h: 30 },
+            { id: 'REJ1', type: 'rect', label: 'REJECT', x: 235, y: 85, w: 70, h: 30 },
+            { id: 'REJ2', type: 'rect', label: 'REJECT', x: 50, y: 535, w: 70, h: 30 },
+            { id: 'REJ3', type: 'rect', label: 'REJECT', x: 780, y: 510, w: 70, h: 30 },
             { id: 'R0', type: 'diamond', label: 'READ 0', x: 160, y: 250, w: 70, h: 40 },
             { id: 'R1', type: 'diamond', label: 'READ 1', x: 300, y: 150, w: 70, h: 40 },
             { id: 'R2', type: 'diamond', label: 'READ 2', x: 300, y: 350, w: 70, h: 40 },
@@ -297,16 +297,16 @@ const automataData = {
             { from: 'R14', to: 'ACC', sideFrom: 'top', sideTo: 'bottom', label: 'Δ ', isCustomPath: true, path: 'M 1140 130 L 1140 95 L 1175 95 L 1175 80', labelX: 1125, labelY: 100 },
             { from: 'R9', to: 'ACC', sideFrom: 'right', sideTo: 'right', label: 'Δ ', isCustomPath: true, path: 'M 1175 350 L 1260 350 L 1260 65 L 1210 65' },
             { from: 'R11', to: 'ACC', sideFrom: 'right', sideTo: 'right', label: 'Δ ', isCustomPath: true, path: 'M 1040 450 L 1260 450 L 1260 65 L 1210 65' },
-            { from: 'R0', to: 'REJ1', sideFrom: 'right', sideTo: 'left', label: 'Δ ' },
-            { from: 'R1', to: 'REJ1', sideFrom: 'bottom', sideTo: 'top', label: 'Δ ' },
-            { from: 'R2', to: 'REJ1', sideFrom: 'top', sideTo: 'bottom', label: 'Δ ' },
-            { from: 'R3', to: 'REJ1', sideFrom: 'bottomLeft', sideTo: 'right', label: 'Δ ' },
-            { from: 'R4', to: 'REJ2', sideFrom: 'right', sideTo: 'left', label: 'Δ ' },
-            { from: 'R6', to: 'REJ2', sideFrom: 'top', sideTo: 'bottom', label: 'Δ ' },
-            { from: 'R12', to: 'REJ2', sideFrom: 'bottomLeft', sideTo: 'right', label: 'Δ ' },
-            { from: 'R10', to: 'REJ3', sideFrom: 'right', sideTo: 'left', label: 'Δ ' },
-            { from: 'R8', to: 'REJ3', sideFrom: 'bottom', sideTo: 'top', label: 'Δ ' },
-            { from: 'R5', to: 'REJ3', sideFrom: 'bottomRight', sideTo: 'top', label: 'Δ ', labelX: 520, labelY: 575 }
+            { from: 'R0', to: 'REJ1', sideFrom: 'topRight', sideTo: 'bottom', label: 'Δ ' },
+            { from: 'R1', to: 'REJ1', sideFrom: 'topLeft', sideTo: 'right', label: 'Δ ' },
+            { from: 'R3', to: 'REJ1', sideFrom: 'topLeft', sideTo: 'right', label: 'Δ ' },
+            { from: 'R2', to: 'REJ2', sideFrom: 'bottomLeft', sideTo: 'top', label: 'Δ ' },
+            { from: 'R5', to: 'REJ2', sideFrom: 'left', sideTo: 'right', label: 'Δ ' },
+            { from: 'R10', to: 'REJ2', sideFrom: 'topLeft', sideTo: 'bottom', label: 'Δ ' },
+            { from: 'R4', to: 'REJ3', sideFrom: 'bottomRight', sideTo: 'top', label: 'Δ ' },
+            { from: 'R6', to: 'REJ3', sideFrom: 'bottomRight', sideTo: 'left', label: 'Δ ' },
+            { from: 'R8', to: 'REJ3', sideFrom: 'right', sideTo: 'left', label: 'Δ ' },
+            { from: 'R12', to: 'REJ3', sideFrom: 'bottom', sideTo: 'top', label: 'Δ ' }
         ]
     }
 };
