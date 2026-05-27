@@ -72,57 +72,72 @@ const automataData = {
             { curr: 'R10', input: 'Δ' , next: 'ACCEPT'  }
         ],
         pdaBlocks: [
-            { id: 'START', type: 'rect', label: 'START', x: 80, y: 140, w: 60, h: 30 },
-            { id: 'ACC', type: 'rect', label: 'ACCEPT', x: 1180, y: 225, w: 70, h: 30 },
-            { id: 'REJ1', type: 'rect', label: 'REJECT', x: 325, y: 225, w: 70, h: 30 },
-            { id: 'REJ2', type: 'rect', label: 'REJECT', x: 675, y: 480, w: 70, h: 30 },
-            { id: 'R0', type: 'diamond', label: 'READ 0', x: 80, y: 240, w: 60, h: 40 },
-            { id: 'R1', type: 'diamond', label: 'READ 1', x: 220, y: 100, w: 60, h: 40 },
-            { id: 'R2', type: 'diamond', label: 'READ 2', x: 220, y: 380, w: 60, h: 40 },
-            { id: 'R3', type: 'diamond', label: 'READ 3', x: 500, y: 240, w: 60, h: 40 },
-            { id: 'R4', type: 'diamond', label: 'READ 4', x: 640, y: 100, w: 60, h: 40 },
-            { id: 'R5', type: 'diamond', label: 'READ 5', x: 640, y: 380, w: 60, h: 40 },
-            { id: 'R6', type: 'diamond', label: 'READ 6', x: 780, y: 100, w: 60, h: 40 },
-            { id: 'R7', type: 'diamond', label: 'READ 7', x: 780, y: 380, w: 60, h: 40 },
-            { id: 'R8', type: 'diamond', label: 'READ 8', x: 920, y: 100, w: 60, h: 40 },
-            { id: 'R9', type: 'diamond', label: 'READ 9', x: 920, y: 380, w: 60, h: 40 },
-            { id: 'R10', type: 'diamond', label: 'READ 10', x: 1060, y: 240, w: 70, h: 40 }
+            { id: 'START', type: 'rect', label: 'START', x: 10, y: 230, w: 80, h: 40 },
+            { id: 'R0', type: 'diamond', label: 'READ 0', x: 150, y: 250, w: 70, h: 50 },
+            { id: 'REJ1', type: 'rect', label: 'REJECT', x: 225, y: 235, w: 70, h: 30 },
+            { id: 'REJ2', type: 'rect', label: 'REJECT', x: 705, y: 40, w: 70, h: 30 },
+            { id: 'REJ3', type: 'rect', label: 'REJECT', x: 705, y: 460, w: 70, h: 30 },
+            { id: 'ACC', type: 'rect', label: 'ACCEPT', x: 1015, y: 100, w: 90, h: 40 },
+            { id: 'R1', type: 'diamond', label: 'READ 1', x: 260, y: 120, w: 70, h: 50 },
+            { id: 'R2', type: 'diamond', label: 'READ 2', x: 260, y: 380, w: 70, h: 50 },
+            { id: 'R3', type: 'diamond', label: 'READ 3', x: 420, y: 250, w: 70, h: 50 },
+            { id: 'R4', type: 'diamond', label: 'READ 4', x: 580, y: 120, w: 70, h: 50 },
+            { id: 'R5', type: 'diamond', label: 'READ 5', x: 580, y: 380, w: 70, h: 50 },
+            { id: 'R6', type: 'diamond', label: 'READ 6', x: 740, y: 120, w: 70, h: 50 },
+            { id: 'R7', type: 'diamond', label: 'READ 7', x: 740, y: 380, w: 70, h: 50 },
+            { id: 'R8', type: 'diamond', label: 'READ 8', x: 900, y: 120, w: 70, h: 50 },
+            { id: 'R9', type: 'diamond', label: 'READ 9', x: 900, y: 380, w: 70, h: 50 },
+            { id: 'R10', type: 'diamond', label: 'READ 10', x: 1060, y: 250, w: 70, h: 50 }
         ],
         pdaLines: [
-            { from: 'START', to: 'R0', sideFrom: 'bottom', sideTo: 'top', label: 'Δ ' },
-            { from: 'R0', to: 'R1', sideFrom: 'topRight', sideTo: 'left', label: 'a ' },
-            { from: 'R0', to: 'R2', sideFrom: 'bottomRight', sideTo: 'left', label: 'b ' },
+            { from: 'START', to: 'R0', sideFrom: 'right', sideTo: 'left', label: 'Δ ' },
+            { from: 'R0', to: 'R1', sideFrom: 'topRight', sideTo: 'bottomLeft', label: 'a ' },
+            { from: 'R0', to: 'R2', sideFrom: 'bottomRight', sideTo: 'topLeft', label: 'b ' },
+            
             { from: 'R0', to: 'REJ1', sideFrom: 'right', sideTo: 'left', label: 'Δ ' },
-            { from: 'R1', to: 'R3', sideFrom: 'right', sideTo: 'topLeft', label: 'a ' },
-            { from: 'R1', to: 'REJ1', sideFrom: 'bottomRight', sideTo: 'topLeft', label: 'b ' },
-            { from: 'R1', to: 'REJ1', sideFrom: 'bottom', sideTo: 'top', label: 'Δ ' },
-            { from: 'R2', to: 'REJ1', sideFrom: 'topRight', sideTo: 'bottomLeft', label: 'a ' },
-            { from: 'R2', to: 'R3', sideFrom: 'right', sideTo: 'bottomLeft', label: 'b ' },
-            { from: 'R2', to: 'REJ1', sideFrom: 'top', sideTo: 'bottom', label: 'Δ ' },
-            { from: 'R3', to: 'R4', sideFrom: 'topRight', sideTo: 'left', label: 'a ' },
-            { from: 'R3', to: 'R5', sideFrom: 'bottomRight', sideTo: 'left', label: 'b ' },
+            { from: 'R1', to: 'REJ1', sideFrom: 'bottom', sideTo: 'top', label: 'b ', isCustomPath: true, path: 'M 260 145 Q 240 190 260 235', labelX: 230, labelY: 190 },
+            { from: 'R1', to: 'REJ1', sideFrom: 'bottom', sideTo: 'top', label: 'Δ ', isCustomPath: true, path: 'M 260 145 Q 280 190 260 235', labelX: 290, labelY: 190 },
+            { from: 'R2', to: 'REJ1', sideFrom: 'top', sideTo: 'bottom', label: 'a ', isCustomPath: true, path: 'M 260 355 Q 240 310 260 265', labelX: 230, labelY: 310 },
+            { from: 'R2', to: 'REJ1', sideFrom: 'top', sideTo: 'bottom', label: 'Δ ', isCustomPath: true, path: 'M 260 355 Q 280 310 260 265', labelX: 290, labelY: 310 },
             { from: 'R3', to: 'REJ1', sideFrom: 'left', sideTo: 'right', label: 'Δ ' },
+
+            { from: 'R1', to: 'R3', sideFrom: 'bottomRight', sideTo: 'topLeft', label: 'a ' },
+            { from: 'R2', to: 'R3', sideFrom: 'topRight', sideTo: 'bottomLeft', label: 'b ' },
+
+            { from: 'R3', to: 'R4', sideFrom: 'topRight', sideTo: 'bottomLeft', label: 'a ' },
+            { from: 'R3', to: 'R5', sideFrom: 'bottomRight', sideTo: 'topLeft', label: 'b ' },
+
             { from: 'R4', to: 'R6', sideFrom: 'right', sideTo: 'left', label: 'a ' },
-            { from: 'R4', to: 'R7', sideFrom: 'bottomRight', sideTo: 'topLeft', label: 'b ' },
-            { from: 'R4', to: 'REJ2', sideFrom: 'bottomLeft', sideTo: 'top', label: 'Δ ', isCustomPath: true, path: 'M 625 120 L 590 150 L 590 495 L 675 495' },
-            { from: 'R5', to: 'R6', sideFrom: 'topRight', sideTo: 'bottomLeft', label: 'a ' },
+            { from: 'R4', to: 'R7', sideFrom: 'bottomRight', sideTo: 'topLeft', label: 'b ', labelX: 620, labelY: 190 },
+            
+            { from: 'R5', to: 'R6', sideFrom: 'topRight', sideTo: 'bottomLeft', label: 'a ', labelX: 620, labelY: 310 },
             { from: 'R5', to: 'R7', sideFrom: 'right', sideTo: 'left', label: 'b ' },
-            { from: 'R5', to: 'REJ2', sideFrom: 'bottom', sideTo: 'left', label: 'Δ ', isCustomPath: true, path: 'M 640 400 L 640 495 L 675 495' },
+
             { from: 'R6', to: 'R8', sideFrom: 'right', sideTo: 'left', label: 'a ' },
             { from: 'R6', to: 'R9', sideFrom: 'bottomRight', sideTo: 'topLeft', label: 'b ' },
-            { from: 'R6', to: 'REJ2', sideFrom: 'bottomLeft', sideTo: 'right', label: 'Δ ', isCustomPath: true, path: 'M 765 120 L 730 150 L 730 495 L 745 495' },
-            { from: 'R7', to: 'R10', sideFrom: 'right', sideTo: 'bottomLeft', label: 'a ' },
+            
             { from: 'R7', to: 'R9', sideFrom: 'right', sideTo: 'left', label: 'b ' },
-            { from: 'R7', to: 'REJ2', sideFrom: 'bottom', sideTo: 'right', label: 'Δ ', isCustomPath: true, path: 'M 780 400 L 780 495 L 745 495' },
-            { from: 'R8', to: 'R8', sideFrom: 'top', sideTo: 'right', label: 'a ', isCustomPath: true, path: 'M 920 80 C 890 40, 950 40, 940 80' },
+            { from: 'R7', to: 'R10', sideFrom: 'bottom', sideTo: 'bottom', label: 'a ', isCustomPath: true, path: 'M 740 405 C 820 500, 980 500, 1060 275' },
+
+            { from: 'R4', to: 'REJ2', sideFrom: 'top', sideTo: 'left', label: 'Δ ', isCustomPath: true, path: 'M 580 95 L 580 55 L 705 55', labelX: 595, labelY: 75 },
+            { from: 'R6', to: 'REJ2', sideFrom: 'top', sideTo: 'bottom', label: 'Δ ', labelX: 725, labelY: 85 },
+            { from: 'R8', to: 'REJ2', sideFrom: 'top', sideTo: 'right', label: 'Δ ', isCustomPath: true, path: 'M 900 95 L 900 55 L 775 55', labelX: 885, labelY: 75 },
+
+            { from: 'R5', to: 'REJ3', sideFrom: 'bottom', sideTo: 'left', label: 'Δ ', isCustomPath: true, path: 'M 580 405 L 580 475 L 705 475', labelX: 595, labelY: 440 },
+            { from: 'R7', to: 'REJ3', sideFrom: 'bottom', sideTo: 'top', label: 'Δ ', labelX: 725, labelY: 432 },
+            { from: 'R9', to: 'REJ3', sideFrom: 'bottom', sideTo: 'right', label: 'Δ ', isCustomPath: true, path: 'M 900 405 L 900 475 L 775 475', labelX: 885, labelY: 440 },
+
+            { from: 'R8', to: 'R8', sideFrom: 'right', sideTo: 'right', label: 'a ', isCustomPath: true, path: 'M 917.5 132.5 C 950 150, 950 90, 917.5 107.5', labelX: 955, labelY: 110 },
             { from: 'R8', to: 'R9', sideFrom: 'bottom', sideTo: 'top', label: 'b ' },
-            { from: 'R8', to: 'ACC', sideFrom: 'right', sideTo: 'topLeft', label: 'Δ ', isCustomPath: true, path: 'M 950 100 L 1190 100 L 1190 225' },
-            { from: 'R9', to: 'R10', sideFrom: 'topRight', sideTo: 'bottom', label: 'a ' },
-            { from: 'R9', to: 'R9', sideFrom: 'bottom', sideTo: 'right', label: 'b ', isCustomPath: true, path: 'M 920 400 C 890 440, 950 440, 940 400' },
-            { from: 'R9', to: 'ACC', sideFrom: 'right', sideTo: 'bottomLeft', label: 'Δ ', isCustomPath: true, path: 'M 950 380 L 1190 380 L 1190 255' },
+            { from: 'R8', to: 'ACC', sideFrom: 'right', sideTo: 'left', label: 'Δ ' },
+
+            { from: 'R9', to: 'R9', sideFrom: 'right', sideTo: 'right', label: 'b ', isCustomPath: true, path: 'M 917.5 392.5 C 950 410, 950 350, 917.5 367.5', labelX: 956, labelY: 388 },
+            { from: 'R9', to: 'R10', sideFrom: 'right', sideTo: 'bottomLeft', label: 'a ', isCustomPath: true, path: 'M 935 380 C 960 330, 1000 270, 1025 250' },
+            { from: 'R9', to: 'ACC', sideFrom: 'right', sideTo: 'right', label: 'Δ ', isCustomPath: true, path: 'M 917.5 392.5 C 1150 450, 1150 120, 1105 120' },
+
             { from: 'R10', to: 'R8', sideFrom: 'topLeft', sideTo: 'right', label: 'a ' },
-            { from: 'R10', to: 'R9', sideFrom: 'bottomLeft', sideTo: 'right', label: 'b ' },
-            { from: 'R10', to: 'ACC', sideFrom: 'right', sideTo: 'left', label: 'Δ ' }
+            { from: 'R10', to: 'R9', sideFrom: 'bottomLeft', sideTo: 'right', label: 'b ', isCustomPath: true, path: 'M 1042.5 262.5 C 1010 320, 950 380, 921 391' },
+            { from: 'R10', to: 'ACC', sideFrom: 'top', sideTo: 'bottom', label: 'Δ ' }
         ]
     },
     '01': {
@@ -220,76 +235,65 @@ const automataData = {
             { curr: 'R15', input: 'Δ' , next: 'ACCEPT'  }
         ],
         pdaBlocks: [
-            { id: 'START', type: 'rect', label: 'START', x: 80, y: 180, w: 60, h: 30 },
-            { id: 'ACC', type: 'rect', label: 'ACCEPT', x: 1220, y: 265, w: 70, h: 30 },
-            { id: 'REJ', type: 'rect', label: 'REJECT', x: 200, y: 600, w: 700, h: 30 },
-            { id: 'R0', type: 'diamond', label: 'READ S0', x: 80, y: 280, w: 70, h: 40 },
-            { id: 'R1', type: 'diamond', label: 'READ S1', x: 220, y: 140, w: 70, h: 40 },
-            { id: 'R2', type: 'diamond', label: 'READ S2', x: 220, y: 420, w: 70, h: 40 },
-            { id: 'R3', type: 'diamond', label: 'READ S3', x: 380, y: 70, w: 70, h: 40 },
-            { id: 'R4', type: 'diamond', label: 'READ S4', x: 380, y: 210, w: 70, h: 40 },
-            { id: 'R5', type: 'diamond', label: 'READ S5', x: 380, y: 350, w: 70, h: 40 },
-            { id: 'R6', type: 'diamond', label: 'READ S6', x: 380, y: 490, w: 70, h: 40 },
-            { id: 'R7', type: 'diamond', label: 'READ S7', x: 560, y: 70, w: 70, h: 40 },
-            { id: 'R8', type: 'diamond', label: 'READ S8', x: 560, y: 280, w: 70, h: 40 },
-            { id: 'R11', type: 'diamond', label: 'READ S11', x: 560, y: 490, w: 80, h: 40 },
-            { id: 'R12', type: 'diamond', label: 'READ S12', x: 740, y: 70, w: 80, h: 40 },
-            { id: 'R9', type: 'diamond', label: 'READ S9', x: 740, y: 280, w: 70, h: 40 },
-            { id: 'R10', type: 'diamond', label: 'READ S10', x: 740, y: 420, w: 80, h: 40 },
-            { id: 'R15', type: 'diamond', label: 'READ S15', x: 920, y: 70, w: 80, h: 40 },
-            { id: 'R13', type: 'diamond', label: 'READ S13', x: 920, y: 280, w: 80, h: 40 },
-            { id: 'R14', type: 'diamond', label: 'READ S14', x: 1080, y: 280, w: 80, h: 40 }
+            { id: 'START', type: 'rect', label: 'START', x: 160, y: 100, w: 60, h: 30 },
+            { id: 'ACC', type: 'rect', label: 'ACCEPT', x: 1140, y: 50, w: 70, h: 30 },
+            { id: 'R0', type: 'diamond', label: 'READ 0', x: 160, y: 250, w: 70, h: 40 },
+            { id: 'R1', type: 'diamond', label: 'READ 1', x: 300, y: 150, w: 70, h: 40 },
+            { id: 'R2', type: 'diamond', label: 'READ 2', x: 300, y: 350, w: 70, h: 40 },
+            { id: 'R3', type: 'diamond', label: 'READ 3', x: 440, y: 150, w: 70, h: 40 },
+            { id: 'R4', type: 'diamond', label: 'READ 4', x: 580, y: 350, w: 70, h: 40 },
+            { id: 'R5', type: 'diamond', label: 'READ 5', x: 440, y: 550, w: 70, h: 40 },
+            { id: 'R6', type: 'diamond', label: 'READ 6', x: 720, y: 450, w: 70, h: 40 },
+            { id: 'R7', type: 'diamond', label: 'READ 7', x: 720, y: 150, w: 70, h: 40 },
+            { id: 'R8', type: 'diamond', label: 'READ 8', x: 580, y: 550, w: 70, h: 40 },
+            { id: 'R9', type: 'diamond', label: 'READ 9', x: 1140, y: 350, w: 70, h: 40 },
+            { id: 'R10', type: 'diamond', label: 'READ 10', x: 440, y: 650, w: 80, h: 40 },
+            { id: 'R11', type: 'diamond', label: 'READ 11', x: 1000, y: 450, w: 80, h: 40 },
+            { id: 'R12', type: 'diamond', label: 'READ 12', x: 790, y: 250, w: 80, h: 40 },
+            { id: 'R13', type: 'diamond', label: 'READ 13', x: 1000, y: 150, w: 80, h: 40 },
+            { id: 'R14', type: 'diamond', label: 'READ 14', x: 1140, y: 150, w: 80, h: 40 },
+            { id: 'R15', type: 'diamond', label: 'READ 15', x: 860, y: 150, w: 80, h: 40 }
         ],
         pdaLines: [
             { from: 'START', to: 'R0', sideFrom: 'bottom', sideTo: 'top', label: 'Δ ' },
             { from: 'R0', to: 'R1', sideFrom: 'topRight', sideTo: 'left', label: '1 ' },
             { from: 'R0', to: 'R2', sideFrom: 'bottomRight', sideTo: 'left', label: '0 ' },
-            { from: 'R0', to: 'REJ', sideFrom: 'bottom', sideTo: 'top', label: 'Δ ', isCustomPath: true, path: 'M 80 300 L 80 580 L 250 580 L 250 600' },
-            { from: 'R1', to: 'R3', sideFrom: 'topRight', sideTo: 'left', label: '1 ' },
+            { from: 'R1', to: 'R3', sideFrom: 'right', sideTo: 'left', label: '1 ' },
             { from: 'R1', to: 'R4', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '0 ' },
-            { from: 'R1', to: 'REJ', sideFrom: 'bottomLeft', sideTo: 'top', label: 'Δ ', isCustomPath: true, path: 'M 202.5 160 L 150 190 L 150 550 L 300 550 L 300 600' },
-            { from: 'R2', to: 'R5', sideFrom: 'topRight', sideTo: 'left', label: '1 ' },
+            { from: 'R2', to: 'R5', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '1 ' },
             { from: 'R2', to: 'R6', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '0 ' },
-            { from: 'R2', to: 'REJ', sideFrom: 'bottom', sideTo: 'top', label: 'Δ ', isCustomPath: true, path: 'M 220 440 L 220 600' },
             { from: 'R3', to: 'R7', sideFrom: 'right', sideTo: 'left', label: '1 ' },
             { from: 'R3', to: 'R8', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '0 ' },
-            { from: 'R3', to: 'REJ', sideFrom: 'bottomLeft', sideTo: 'top', label: 'Δ ', isCustomPath: true, path: 'M 362.5 90 L 320 120 L 320 600' },
-            { from: 'R4', to: 'R9', sideFrom: 'right', sideTo: 'topLeft', label: '1 ' },
-            { from: 'R4', to: 'R6', sideFrom: 'bottom', sideTo: 'top', label: '0 ' },
-            { from: 'R4', to: 'REJ', sideFrom: 'bottomLeft', sideTo: 'top', label: 'Δ ', isCustomPath: true, path: 'M 362.5 230 L 340 250 L 340 600' },
-            { from: 'R5', to: 'R10', sideFrom: 'bottomRight', sideTo: 'left', label: '1 ' },
-            { from: 'R5', to: 'R8', sideFrom: 'topRight', sideTo: 'bottomLeft', label: '0 ' },
-            { from: 'R5', to: 'REJ', sideFrom: 'bottomLeft', sideTo: 'top', label: 'Δ ', isCustomPath: true, path: 'M 362.5 370 L 360 390 L 360 600' },
-            { from: 'R6', to: 'R5', sideFrom: 'topRight', sideTo: 'bottomLeft', label: '1 ' },
+            { from: 'R4', to: 'R9', sideFrom: 'right', sideTo: 'left', label: '1 ' },
+            { from: 'R4', to: 'R6', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '0 ' },
+            { from: 'R5', to: 'R10', sideFrom: 'bottom', sideTo: 'top', label: '1 ' },
+            { from: 'R5', to: 'R8', sideFrom: 'right', sideTo: 'left', label: '0 ' },
+            { from: 'R6', to: 'R5', sideFrom: 'bottomLeft', sideTo: 'bottomRight', label: '1 ' },
             { from: 'R6', to: 'R11', sideFrom: 'right', sideTo: 'left', label: '0 ' },
-            { from: 'R6', to: 'REJ', sideFrom: 'bottom', sideTo: 'top', label: 'Δ ', isCustomPath: true, path: 'M 380 510 L 380 600' },
-            { from: 'R8', to: 'R9', sideFrom: 'right', sideTo: 'left', label: '1 ' },
-            { from: 'R8', to: 'R6', sideFrom: 'bottomLeft', sideTo: 'topRight', label: '0 ' },
-            { from: 'R8', to: 'REJ', sideFrom: 'bottom', sideTo: 'top', label: 'Δ ', isCustomPath: true, path: 'M 560 300 L 560 600' },
-            { from: 'R10', to: 'R14', sideFrom: 'right', sideTo: 'bottomLeft', label: '1 ', isCustomPath: true, path: 'M 775 420 L 1050 420 L 1050 300' },
-            { from: 'R10', to: 'R8', sideFrom: 'topLeft', sideTo: 'bottomRight', label: '0 ' },
-            { from: 'R10', to: 'REJ', sideFrom: 'bottom', sideTo: 'top', label: 'Δ ', isCustomPath: true, path: 'M 740 440 L 740 600' },
-            { from: 'R7', to: 'R12', sideFrom: 'right', sideTo: 'left', label: '1 ' },
-            { from: 'R7', to: 'R13', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '0 ' },
-            { from: 'R7', to: 'ACC', sideFrom: 'top', sideTo: 'top', label: 'Δ ', isCustomPath: true, path: 'M 560 50 L 560 20 L 1255 20 L 1255 265' },
-            { from: 'R9', to: 'R14', sideFrom: 'right', sideTo: 'left', label: '1 ' },
-            { from: 'R9', to: 'R13', sideFrom: 'bottomRight', sideTo: 'bottomLeft', label: '0 ' },
-            { from: 'R9', to: 'ACC', sideFrom: 'top', sideTo: 'top', label: 'Δ ', isCustomPath: true, path: 'M 740 260 L 740 235 L 1270 235 L 1270 265' },
+            { from: 'R7', to: 'R12', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '1 ' },
+            { from: 'R7', to: 'R13', sideFrom: 'right', sideTo: 'left', label: '0 ', isCustomPath: true, path: 'M 755 150 C 860 70, 960 70, 965 150' },
+            { from: 'R8', to: 'R9', sideFrom: 'topRight', sideTo: 'bottomLeft', label: '1 ' },
+            { from: 'R8', to: 'R6', sideFrom: 'topRight', sideTo: 'bottomLeft', label: '0 ' },
+            { from: 'R9', to: 'R14', sideFrom: 'top', sideTo: 'bottom', label: '1 ' },
+            { from: 'R9', to: 'R13', sideFrom: 'topLeft', sideTo: 'bottomRight', label: '0 ' },
+            { from: 'R10', to: 'R14', sideFrom: 'right', sideTo: 'right', label: '1 ', isCustomPath: true, path: 'M 480 650 L 1220 650 L 1220 150 L 1180 150' },
+            { from: 'R10', to: 'R8', sideFrom: 'topRight', sideTo: 'bottomLeft', label: '0 ' },
             { from: 'R11', to: 'R9', sideFrom: 'topRight', sideTo: 'bottomLeft', label: '1 ' },
-            { from: 'R11', to: 'R11', sideFrom: 'bottom', sideTo: 'right', label: '0 ', isCustomPath: true, path: 'M 560 510 C 530 550, 590 550, 580 510' },
-            { from: 'R11', to: 'ACC', sideFrom: 'right', sideTo: 'bottom', label: 'Δ ', isCustomPath: true, path: 'M 600 490 L 1255 490 L 1255 295' },
-            { from: 'R12', to: 'R15', sideFrom: 'right', sideTo: 'left', label: '1 ' },
-            { from: 'R12', to: 'R13', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '0 ' },
-            { from: 'R12', to: 'ACC', sideFrom: 'top', sideTo: 'top', label: 'Δ ', isCustomPath: true, path: 'M 740 50 L 740 30 L 1240 30 L 1240 265' },
-            { from: 'R13', to: 'R9', sideFrom: 'topLeft', sideTo: 'topRight', label: '1 ' },
-            { from: 'R13', to: 'R11', sideFrom: 'bottomLeft', sideTo: 'topRight', label: '0 ' },
-            { from: 'R13', to: 'ACC', sideFrom: 'right', sideTo: 'left', label: 'Δ ', isCustomPath: true, path: 'M 960 280 L 1220 280' },
-            { from: 'R14', to: 'R14', sideFrom: 'right', sideTo: 'top', label: '1 ', isCustomPath: true, path: 'M 1120 280 C 1160 250, 1140 310, 1090 290' },
-            { from: 'R14', to: 'R13', sideFrom: 'bottomLeft', sideTo: 'bottomRight', label: '0 ' },
-            { from: 'R14', to: 'ACC', sideFrom: 'right', sideTo: 'left', label: 'Δ ' },
-            { from: 'R15', to: 'R7', sideFrom: 'top', sideTo: 'top', label: '1 ', isCustomPath: true, path: 'M 920 50 C 800 -10, 680 -10, 560 50' },
-            { from: 'R15', to: 'R13', sideFrom: 'bottom', sideTo: 'top', label: '0 ' },
-            { from: 'R15', to: 'ACC', sideFrom: 'right', sideTo: 'top', label: 'Δ ', isCustomPath: true, path: 'M 960 70 L 1285 70 L 1285 265' }
+            { from: 'R11', to: 'R11', sideFrom: 'bottom', sideTo: 'right', label: '0 ', isCustomPath: true, path: 'M 1000 470 C 970 520, 1070 520, 1035 455' },
+            { from: 'R12', to: 'R15', sideFrom: 'topRight', sideTo: 'bottomLeft', label: '1 ' },
+            { from: 'R12', to: 'R13', sideFrom: 'topRight', sideTo: 'bottomLeft', label: '0 ' },
+            { from: 'R13', to: 'R9', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '1 ' },
+            { from: 'R13', to: 'R11', sideFrom: 'bottom', sideTo: 'top', label: '0 ' },
+            { from: 'R14', to: 'R14', sideFrom: 'top', sideTo: 'right', label: '1 ', isCustomPath: true, path: 'M 1140 130 C 1170 80, 1220 120, 1175 150' },
+            { from: 'R14', to: 'R13', sideFrom: 'left', sideTo: 'right', label: '0 ' },
+            { from: 'R15', to: 'R7', sideFrom: 'left', sideTo: 'right', label: '1 ' },
+            { from: 'R15', to: 'R13', sideFrom: 'right', sideTo: 'left', label: '0 ' },
+            { from: 'R7', to: 'ACC', sideFrom: 'top', sideTo: 'left', label: 'Δ ', isCustomPath: true, path: 'M 720 130 L 720 70 L 1095 70' },
+            { from: 'R15', to: 'ACC', sideFrom: 'top', sideTo: 'left', label: 'Δ ', isCustomPath: true, path: 'M 860 130 L 860 70 L 1095 70' },
+            { from: 'R13', to: 'ACC', sideFrom: 'top', sideTo: 'left', label: 'Δ ', isCustomPath: true, path: 'M 1000 130 L 1000 70 L 1095 70' },
+            { from: 'R14', to: 'ACC', sideFrom: 'top', sideTo: 'bottom', label: 'Δ ', isCustomPath: true, path: 'M 1140 130 L 1140 70' },
+            { from: 'R9', to: 'ACC', sideFrom: 'right', sideTo: 'right', label: 'Δ ', isCustomPath: true, path: 'M 1175 350 L 1260 350 L 1260 70 L 1185 70' },
+            { from: 'R11', to: 'ACC', sideFrom: 'right', sideTo: 'right', label: 'Δ ', isCustomPath: true, path: 'M 1040 450 L 1260 450 L 1260 70 L 1185 70' }
         ]
     }
 };
@@ -304,6 +308,20 @@ let nextRowId = 0;
 let graphBaseViewBox = null;
 let graphViewBox = null;
 let graphZoomLevel = 1;
+let isDraggingGraph = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let startViewBoxX = 0;
+let startViewBoxY = 0;
+
+let pdaBaseViewBox = null;
+let pdaViewBox = null;
+let pdaZoomLevel = 1;
+let isDraggingPda = false;
+let pdaDragStartX = 0;
+let pdaDragStartY = 0;
+let startPdaViewBoxX = 0;
+let startPdaViewBoxY = 0;
 
 let activeTrace = {
     frames: [],
@@ -354,13 +372,14 @@ function bindGlobalEvents() {
     }
 
     const canvasContainer = document.getElementById('canvas-container');
+    const pdaContainer = document.getElementById('pda-canvas-container');
+
     canvasContainer.addEventListener('mousemove', onGraphMouseMove);
-    canvasContainer.addEventListener('mouseleave', (e) => {
+    canvasContainer.addEventListener('mouseleave', () => {
         isDraggingGraph = false;
         canvasContainer.style.cursor = 'grab';
         hideGraphTooltip();
     });
-
     canvasContainer.addEventListener('mousedown', (e) => {
         isDraggingGraph = true;
         dragStartX = e.clientX;
@@ -369,11 +388,39 @@ function bindGlobalEvents() {
         startViewBoxY = graphViewBox.y;
         canvasContainer.style.cursor = 'grabbing';
     });
+    canvasContainer.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        adjustGraphZoom(e.deltaY < 0 ? 1.1 : 0.9);
+    });
+
+    if (pdaContainer) {
+        pdaContainer.addEventListener('mousemove', onPdaMouseMove);
+        pdaContainer.addEventListener('mouseleave', () => {
+            isDraggingPda = false;
+            pdaContainer.style.cursor = 'grab';
+        });
+        pdaContainer.addEventListener('mousedown', (e) => {
+            isDraggingPda = true;
+            pdaDragStartX = e.clientX;
+            pdaDragStartY = e.clientY;
+            startPdaViewBoxX = pdaViewBox.x;
+            startPdaViewBoxY = pdaViewBox.y;
+            pdaContainer.style.cursor = 'grabbing';
+        });
+        pdaContainer.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            adjustGraphZoom(e.deltaY < 0 ? 1.1 : 0.9);
+        });
+    }
 
     window.addEventListener('mouseup', () => {
         if (isDraggingGraph) {
             isDraggingGraph = false;
             canvasContainer.style.cursor = 'grab';
+        }
+        if (isDraggingPda && pdaContainer) {
+            isDraggingPda = false;
+            pdaContainer.style.cursor = 'grab';
         }
     });
 
@@ -571,11 +618,7 @@ function replayTrace(historyIdx) {
 }
 
 let isDocked = false;
-let isDraggingGraph = false;
-let dragStartX = 0;
-let dragStartY = 0;
-let startViewBoxX = 0;
-let startViewBoxY = 0;
+
 
 function toggleDockMode() {
     isDocked = !isDocked;
@@ -906,29 +949,50 @@ function computeGraphBaseViewBox() {
     graphZoomLevel = 1;
 }
 
+function computePdaBaseViewBox() {
+    const w = currentAlphabet === 'ab' ? 1300 : 1350;
+    const h = currentAlphabet === 'ab' ? 550 : 700;
+    pdaBaseViewBox = { x: 0, y: 0, w, h };
+    pdaViewBox = { ...pdaBaseViewBox };
+    pdaZoomLevel = 1;
+}
+
 function getEffectiveViewBox() {
     if (!graphViewBox) computeGraphBaseViewBox();
     const cx = graphViewBox.x + graphViewBox.w / 2;
     const cy = graphViewBox.y + graphViewBox.h / 2;
     const w = graphViewBox.w / graphZoomLevel;
     const h = graphViewBox.h / graphZoomLevel;
-    return {
-        x: cx - w / 2,
-        y: cy - h / 2,
-        w,
-        h
-    };
+    return { x: cx - w / 2, y: cy - h / 2, w, h };
+}
+
+function getEffectivePdaViewBox() {
+    if (!pdaViewBox) computePdaBaseViewBox();
+    const cx = pdaViewBox.x + pdaViewBox.w / 2;
+    const cy = pdaViewBox.y + pdaViewBox.h / 2;
+    const w = pdaViewBox.w / pdaZoomLevel;
+    const h = pdaViewBox.h / pdaZoomLevel;
+    return { x: cx - w / 2, y: cy - h / 2, w, h };
 }
 
 function fitGraphToView() {
-    computeGraphBaseViewBox();
-    graphZoomLevel = 1;
-    renderSVGGraph(getTraceFrameState());
+    if (currentTab === 'pda') {
+        computePdaBaseViewBox();
+        renderPDAGraph();
+    } else {
+        computeGraphBaseViewBox();
+        renderSVGGraph(getTraceFrameState());
+    }
 }
 
 function adjustGraphZoom(factor) {
-    graphZoomLevel = Math.min(4, Math.max(0.35, graphZoomLevel * factor));
-    renderSVGGraph(getTraceFrameState());
+    if (currentTab === 'pda') {
+        pdaZoomLevel = Math.min(4, Math.max(0.35, pdaZoomLevel * factor));
+        renderPDAGraph();
+    } else {
+        graphZoomLevel = Math.min(4, Math.max(0.35, graphZoomLevel * factor));
+        renderSVGGraph(getTraceFrameState());
+    }
 }
 
 function isTrapState(nodeId) {
@@ -1130,6 +1194,22 @@ function onGraphMouseMove(e) {
     tooltip.style.top = `${e.clientY - panelRect.top + 12}px`;
 }
 
+function onPdaMouseMove(e) {
+    if (isDraggingPda) {
+        const container = document.getElementById('pda-canvas-container');
+        const effectiveViewBox = getEffectivePdaViewBox();
+        const ratio = effectiveViewBox.w / container.clientWidth;
+
+        const dx = (e.clientX - pdaDragStartX) * ratio;
+        const dy = (e.clientY - pdaDragStartY) * ratio;
+
+        pdaViewBox.x = startPdaViewBoxX - dx;
+        pdaViewBox.y = startPdaViewBoxY - dy;
+
+        renderPDAGraph();
+    }
+}
+
 function hideGraphTooltip() {
     const tooltip = document.getElementById('graph-tooltip');
     if (tooltip) tooltip.classList.add('hidden');
@@ -1143,8 +1223,9 @@ function renderPDAGraph() {
     const viewWidth = currentAlphabet === 'ab' ? 1300 : 1350;
     const viewHeight = currentAlphabet === 'ab' ? 550 : 700;
     const theme = getGraphTheme();
+    const eff = getEffectivePdaViewBox();
 
-    let pdaSvgHtml = `<svg width="100%" height="${viewHeight}" viewBox="0 0 ${viewWidth} ${viewHeight}" preserveAspectRatio="xMidYMid meet" class="mx-auto">`;
+    let pdaSvgHtml = `<svg width="100%" height="${viewHeight}" viewBox="${eff.x} ${eff.y} ${eff.w} ${eff.h}" preserveAspectRatio="xMidYMid meet" class="mx-auto" style="cursor: ${isDraggingPda ? 'grabbing' : 'grab'};">`;
 
     pdaSvgHtml += `
         <defs>
@@ -1199,6 +1280,8 @@ function renderPDAGraph() {
                     }
                 }
             }
+            if (line.labelX !== undefined) tx = line.labelX;
+            if (line.labelY !== undefined) ty = line.labelY;
             pdaSvgHtml += `<text class="graph-label" x="${tx}" y="${ty}" fill="#d97706" font-size="12" font-family="monospace" font-weight="bold" text-anchor="middle">${line.label}</text>`;
         }
     });
