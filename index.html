@@ -5,226 +5,489 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATMTA - Interactive Tracing System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital@1&display=swap"
-        rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
-                    },
-                    colors: {
-                        brand: {
-                            dark: '#2f3f4f',
-                            teal: '#006680',
-                            tealhover: '#005266'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <meta name="description" content="An interactive workspace for Automata & Formal Languages. Design, simulate, and debug DFAs, CFGs, and PDAs in real-time.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
 
     <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0f172a;
+            --bg2: #1e293b;
+            --border: #334155;
+            --accent: #2563eb;
+            --accent2: #60a5fa;
+            --accent-glow: rgba(37, 99, 235, 0.35);
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --green: #10b981;
+            --card-bg: rgba(30, 41, 59, 0.7);
+        }
+
+        html { scroll-behavior: smooth; }
+
         body {
-            background-color: #f8fafc;
-            /* Grid Background */
-            background-size: 40px 40px;
-            background-image:
-                linear-gradient(to right, rgba(100, 116, 139, 0.05) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(100, 116, 139, 0.05) 1px, transparent 1px);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             min-height: 100vh;
-            color: #0f172a;
             overflow-x: hidden;
             display: flex;
             flex-direction: column;
         }
 
-        /* Moving Gradient Background */
-        .gradient-bg {
+        /* ─── Animated grid background ─── */
+        .bg-grid {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: -2;
-            background:
-                radial-gradient(circle at 15% 50%, rgba(37, 99, 235, 0.03), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(13, 148, 136, 0.03), transparent 25%);
-            animation: moveGradient 15s ease-in-out infinite alternate;
-        }
-
-        @keyframes moveGradient {
-            0% {
-                background-position: 0% 0%;
-            }
-
-            100% {
-                background-position: 100% 100%;
-            }
-        }
-
-        /* Decorative Background Lines & Nodes */
-        .bg-nodes {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: -1;
+            inset: 0;
+            z-index: 0;
+            background-image:
+                linear-gradient(to right, rgba(51, 65, 85, 0.35) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(51, 65, 85, 0.35) 1px, transparent 1px);
+            background-size: 48px 48px;
             pointer-events: none;
         }
 
-        .bg-nodes svg {
-            width: 100%;
-            height: 100%;
-            opacity: 0.4;
-        }
-
-        /* Animations */
-        .fade-in-up {
-            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        .delay-1 {
-            animation-delay: 0.1s;
-        }
-
-        .delay-2 {
-            animation-delay: 0.2s;
-        }
-
-        .delay-3 {
-            animation-delay: 0.3s;
-        }
-
-        .delay-4 {
-            animation-delay: 0.5s;
-        }
-
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Mockup Window */
-        .mockup-window {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.05);
+        /* ─── Radial glow blobs ─── */
+        .bg-blobs {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
             overflow: hidden;
+        }
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            animation: blobDrift 18s ease-in-out infinite alternate;
+        }
+        .blob-1 { width: 600px; height: 600px; background: #2563eb; top: -150px; left: -100px; animation-delay: 0s; }
+        .blob-2 { width: 500px; height: 500px; background: #7c3aed; bottom: -100px; right: -80px; animation-delay: -6s; }
+        .blob-3 { width: 400px; height: 400px; background: #0891b2; top: 40%; left: 40%; animation-delay: -12s; }
+
+        @keyframes blobDrift {
+            0%   { transform: translate(0, 0) scale(1); }
+            50%  { transform: translate(40px, -30px) scale(1.08); }
+            100% { transform: translate(-20px, 50px) scale(0.95); }
+        }
+
+        /* ─── Navbar ─── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            height: 64px;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .nav-logo img { height: 28px; width: auto; object-fit: contain; }
+        .nav-logo-divider { width: 1px; height: 20px; background: var(--border); }
+        .nav-logo-text {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .nav-right { display: flex; align-items: center; gap: 1rem; }
+        .nav-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 99px;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            background: rgba(37, 99, 235, 0.1);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent2);
+        }
+        .nav-badge-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.5; transform: scale(1.4); }
+        }
+
+        .nav-cta {
+            padding: 7px 18px;
+            border-radius: 8px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+            box-shadow: 0 0 0 0 var(--accent-glow);
+        }
+        .nav-cta:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px var(--accent-glow);
+        }
+
+        /* ─── Hero ─── */
+        main {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 140px 24px 80px;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 99px;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            background: rgba(37, 99, 235, 0.1);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent2);
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeUp 0.7s 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .hero-eyebrow-icon { font-size: 14px; }
+
+        .hero-italic {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: var(--muted);
+            margin-bottom: 0.75rem;
+            opacity: 0;
+            animation: fadeUp 0.7s 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .hero-title {
+            font-size: clamp(5rem, 14vw, 10rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            line-height: 0.9;
+            background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 50%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeUp 0.8s 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .hero-sub {
+            font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+            color: var(--muted);
+            max-width: 580px;
+            text-align: center;
+            line-height: 1.75;
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            animation: fadeUp 0.7s 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .hero-sub strong { color: var(--accent2); font-weight: 600; }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 5rem;
+            opacity: 0;
+            animation: fadeUp 0.7s 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 28px;
+            border-radius: 10px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s;
+            box-shadow: 0 4px 24px var(--accent-glow);
+        }
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px var(--accent-glow);
+        }
+        .btn-primary svg { transition: transform 0.2s; }
+        .btn-primary:hover svg { transform: translateX(3px); }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 24px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+            border-color: var(--accent2);
+            color: var(--accent2);
+            background: rgba(96, 165, 250, 0.07);
+        }
+
+        /* ─── Feature chips ─── */
+        .feature-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 4rem;
+            opacity: 0;
+            animation: fadeUp 0.7s 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 99px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted);
+            backdrop-filter: blur(8px);
+        }
+        .chip-icon { font-size: 13px; }
+
+        /* ─── Mockup Window ─── */
+        .mockup-wrap {
             width: 100%;
             max-width: 900px;
-            margin: 0 auto;
-            border: 1px solid #e2e8f0;
+            opacity: 0;
+            animation: fadeUp 0.9s 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .mockup-window {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.04) inset,
+                0 32px 80px rgba(0,0,0,0.5),
+                0 0 60px rgba(37,99,235,0.08);
         }
 
         .mockup-header {
-            background: #eef2f6;
-            height: 38px;
+            background: var(--bg2);
+            height: 42px;
             display: flex;
             align-items: center;
-            padding: 0 16px;
-            border-bottom: 1px solid #e2e8f0;
+            padding: 0 18px;
+            border-bottom: 1px solid var(--border);
             position: relative;
         }
-
-        .mockup-dots {
-            display: flex;
-            gap: 6px;
-        }
-
-        .mockup-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        .dot-red {
-            background: #ff5f56;
-        }
-
-        .dot-yellow {
-            background: #ffbd2e;
-        }
-
-        .dot-green {
-            background: #27c93f;
-        }
-
+        .mockup-dots { display: flex; gap: 7px; }
+        .mockup-dot { width: 11px; height: 11px; border-radius: 50%; }
+        .dot-red    { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green  { background: #27c93f; }
         .mockup-title {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 9px;
+            font-size: 10px;
             font-weight: 700;
-            letter-spacing: 0.1em;
-            color: #94a3b8;
+            letter-spacing: 0.12em;
+            color: var(--muted);
             text-transform: uppercase;
+        }
+
+        .mockup-body {
+            display: flex;
+            height: 320px;
+            background: var(--bg);
+        }
+
+        .mockup-sidebar {
+            width: 220px;
+            border-right: 1px solid var(--border);
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .mock-bar {
+            height: 10px;
+            border-radius: 6px;
+            background: var(--border);
+            animation: shimmer 2.5s infinite linear;
+            background-size: 200% 100%;
+            background-image: linear-gradient(90deg, var(--border) 25%, #334155 50%, var(--border) 75%);
+        }
+        .mock-bar.accent { background-image: linear-gradient(90deg, rgba(37,99,235,0.2) 25%, rgba(96,165,250,0.3) 50%, rgba(37,99,235,0.2) 75%); }
+        @keyframes shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .mock-btn {
+            height: 34px;
+            border-radius: 8px;
+            background: rgba(37,99,235,0.2);
+            border: 1px solid rgba(96,165,250,0.25);
+            margin-top: auto;
+        }
+
+        .mockup-canvas {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated DFA inside mockup */
+        .mini-dfa { position: relative; }
+        .mini-dfa svg { overflow: visible; }
+        .dfa-node-circle {
+            transition: all 0.4s;
+        }
+        @keyframes nodeGlow {
+            0%, 100% { filter: drop-shadow(0 0 0px #2563eb); }
+            50%       { filter: drop-shadow(0 0 12px #2563eb); }
+        }
+        .node-active { animation: nodeGlow 1.5s ease-in-out infinite; }
+
+        /* ─── Animations ─── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Footer ─── */
+        footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 2rem;
+            font-size: 12px;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+        }
+        footer a { color: var(--accent2); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        @media (max-width: 600px) {
+            .mockup-sidebar { display: none; }
+            .hero-actions { flex-direction: column; }
         }
     </style>
 </head>
 
-<body class="antialiased selection:bg-brand-teal selection:text-white">
-
-    <div class="gradient-bg"></div>
-
-    <div class="bg-nodes">
-        <svg preserveAspectRatio="xMidYMid slice">
-            <!-- Background Decorative Elements matching the image -->
-            <path d="M 250 250 L 750 150 L 850 550" fill="none" stroke="#cbd5e1" stroke-width="1"
-                stroke-dasharray="4 4" />
-            <circle cx="250" cy="250" r="40" fill="none" stroke="#94a3b8" stroke-width="1" />
-            <circle cx="750" cy="150" r="50" fill="none" stroke="#94a3b8" stroke-width="1" />
-        </svg>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
     </div>
 
-    <main class="relative z-10 flex-1 flex flex-col items-center pt-24 px-6 pb-12 w-full max-w-5xl mx-auto">
+    <!-- Navbar -->
+    <nav>
+        <a href="#" class="nav-logo">
+            <img src="logo_atmt.png" alt="ATMTA Logo">
+            <div class="nav-logo-divider"></div>
+            <span class="nav-logo-text">Interactive Tracing System</span>
+        </a>
+        <div class="nav-right">
+            <div class="nav-badge">
+                <span class="nav-badge-dot"></span>
+                v1.0 Live
+            </div>
+            <a href="DFA_Tester.html" class="nav-cta">Launch App</a>
+        </div>
+    </nav>
 
-        <!-- Subtle Top Text -->
-        <p class="font-serif italic text-slate-400 text-lg md:text-xl mb-4 fade-in-up">
-            Logic and syntax, in perfect rhythm.
+    <!-- Hero -->
+    <main>
+        <div class="hero-eyebrow">
+            <span class="hero-eyebrow-icon">⚡</span>
+            Automata Theory · Interactive Workspace
+        </div>
+
+        <p class="hero-italic">Logic and syntax, in perfect rhythm.</p>
+
+        <h1 class="hero-title">ATMTA</h1>
+
+        <p class="hero-sub">
+            An interactive workspace for <strong>Automata &amp; Formal Languages</strong>.
+            Design, simulate, and debug Deterministic Finite Automata,
+            Context-Free Grammars, and Pushdown Automata in a professional, real-time environment.
         </p>
 
-        <!-- Main Huge Logo Text -->
-        <h1 class="text-7xl md:text-9xl font-black tracking-tighter text-brand-dark mb-6 fade-in-up delay-1">
-            ATMTA
-        </h1>
-
-        <!-- Sub Description -->
-        <p class="text-slate-500 text-base md:text-lg max-w-2xl text-center leading-relaxed mb-10 fade-in-up delay-2">
-            An interactive workspace for <strong class="text-brand-teal">Automata & Formal Languages</strong>. Design,
-            simulate, and debug Deterministic Finite Automata, Context-Free Grammars, and Pushdown Automata in a
-            professional, real-time environment.
-        </p>
-
-        <!-- Action Buttons -->
-        <div class="flex items-center gap-6 mb-20 fade-in-up delay-3">
-            <a href="DFA_Tester.html"
-                class="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-brand-teal hover:bg-brand-tealhover text-white font-bold text-sm transition-colors shadow-md">
+        <div class="hero-actions">
+            <a href="DFA_Tester.html" class="btn-primary">
                 Enter Dashboard
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                    stroke-linecap="round" stroke-linejoin="round">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                     <polyline points="12 5 19 12 12 19"></polyline>
                 </svg>
             </a>
-            <a href="#" class="text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors">
-                View Demo
+            <a href="#features" class="btn-secondary">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
+                </svg>
+                View Features
             </a>
         </div>
 
-        <!-- App Mockup Window -->
-        <div class="w-full fade-in-up delay-4">
+        <!-- Feature chips -->
+        <div class="feature-chips" id="features">
+            <div class="chip"><span class="chip-icon">🔵</span> DFA Transition Graph</div>
+            <div class="chip"><span class="chip-icon">📐</span> Context-Free Grammar</div>
+            <div class="chip"><span class="chip-icon">📚</span> Pushdown Automata</div>
+            <div class="chip"><span class="chip-icon">▶</span> Animated Trace</div>
+            <div class="chip"><span class="chip-icon">🌙</span> Dark / Light Mode</div>
+            <div class="chip"><span class="chip-icon">⚡</span> Instant Validation</div>
+        </div>
+
+        <!-- Mockup -->
+        <div class="mockup-wrap">
             <div class="mockup-window">
                 <div class="mockup-header">
                     <div class="mockup-dots">
@@ -232,51 +495,99 @@
                         <div class="mockup-dot dot-yellow"></div>
                         <div class="mockup-dot dot-green"></div>
                     </div>
-                    <div class="mockup-title">Simulator v1.0.4</div>
+                    <div class="mockup-title">ATMTA Simulator v1.0</div>
                 </div>
-                <div class="flex h-80 bg-slate-50">
-                    <!-- Sidebar Mockup -->
-                    <div class="w-1/3 max-w-[240px] bg-white border-r border-slate-100 p-6 flex flex-col gap-4">
-                        <div class="h-4 bg-indigo-100 rounded-sm w-3/4"></div>
-                        <div class="h-4 bg-indigo-100 rounded-sm w-1/2"></div>
-                        <div class="h-4 bg-indigo-100 rounded-sm w-2/3 mb-4"></div>
-                        <div class="h-10 border border-slate-200 bg-slate-50 rounded-sm w-full"></div>
+                <div class="mockup-body">
+                    <!-- Sidebar skeleton -->
+                    <div class="mockup-sidebar">
+                        <div class="mock-bar accent" style="width:65%"></div>
+                        <div class="mock-bar" style="width:80%"></div>
+                        <div class="mock-bar" style="width:55%"></div>
+                        <div class="mock-bar" style="width:70%; margin-top:8px"></div>
+                        <div class="mock-bar" style="width:45%"></div>
+                        <div class="mock-bar" style="width:60%"></div>
+                        <div class="mock-btn"></div>
                     </div>
-                    <!-- Main Area Mockup -->
-                    <div class="flex-1 bg-slate-100 relative flex items-center justify-center">
-                        <svg width="240" height="100" viewBox="0 0 240 100" class="overflow-visible">
-                            <!-- Arrow line -->
-                            <path d="M 60 50 L 152 50" fill="none" stroke="#3b82f6" stroke-width="3"
-                                marker-end="url(#mockup-arrow)" />
-                            <text x="106" y="42" fill="#3b82f6" font-size="11" text-anchor="middle"
-                                font-family="monospace" font-weight="bold">1</text>
+                    <!-- Canvas area -->
+                    <div class="mockup-canvas">
+                        <div class="mini-dfa">
+                            <svg width="480" height="220" viewBox="0 0 480 220">
+                                <defs>
+                                    <marker id="arr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#334155"/>
+                                    </marker>
+                                    <marker id="arr-active" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#60a5fa"/>
+                                    </marker>
+                                </defs>
 
-                            <!-- q0 Node (Active Start State) -->
-                            <circle cx="40" cy="50" r="20" fill="#eff6ff" stroke="#3b82f6" stroke-width="3" />
-                            <text x="40" y="47" fill="#0f172a" font-size="15" font-weight="bold" text-anchor="middle"
-                                font-family="sans-serif">−</text>
-                            <text x="40" y="59" fill="#0f172a" font-size="10" font-weight="bold" text-anchor="middle"
-                                font-family="monospace">S0</text>
+                                <!-- Edges -->
+                                <line x1="56" y1="110" x2="114" y2="110" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+                                <text x="85" y="104" fill="#64748b" font-size="10" text-anchor="middle" font-family="Fira Code, monospace">Δ</text>
 
-                            <!-- q1 Node (Inactive) -->
-                            <circle cx="180" cy="50" r="20" fill="#ffffff" stroke="#64748b" stroke-width="2" />
-                            <text x="180" y="54" fill="#0f172a" font-size="10" font-weight="bold" text-anchor="middle"
-                                font-family="monospace">S1</text>
+                                <line x1="160" y1="90" x2="218" y2="68" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+                                <text x="183" y="73" fill="#64748b" font-size="10" text-anchor="middle" font-family="Fira Code, monospace">a</text>
 
-                            <defs>
-                                <marker id="mockup-arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6"
-                                    markerHeight="6" orient="auto">
-                                    <path d="M 0 1 L 10 5 L 0 9 z" fill="#3b82f6" />
-                                </marker>
-                            </defs>
-                        </svg>
+                                <line x1="160" y1="130" x2="218" y2="152" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+                                <text x="183" y="148" fill="#64748b" font-size="10" text-anchor="middle" font-family="Fira Code, monospace">b</text>
+
+                                <!-- Active edge - animated -->
+                                <line x1="264" y1="60" x2="336" y2="60" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr-active)" id="active-edge">
+                                    <animate attributeName="stroke-opacity" values="0.3;1;0.3" dur="1.8s" repeatCount="indefinite"/>
+                                </line>
+                                <text x="300" y="52" fill="#60a5fa" font-size="10" text-anchor="middle" font-family="Fira Code, monospace">a</text>
+
+                                <line x1="264" y1="160" x2="336" y2="160" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+                                <text x="300" y="152" fill="#64748b" font-size="10" text-anchor="middle" font-family="Fira Code, monospace">b</text>
+
+                                <line x1="376" y1="78" x2="418" y2="110" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+                                <line x1="376" y1="142" x2="418" y2="118" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+
+                                <!-- Nodes -->
+                                <!-- S0 - start -->
+                                <text x="40" y="107" fill="#64748b" font-size="14" font-weight="bold" text-anchor="middle" font-family="sans-serif">→</text>
+                                <circle cx="140" cy="110" r="20" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+                                <text x="140" y="107" fill="#e2e8f0" font-size="11" font-weight="bold" text-anchor="middle" font-family="Fira Code, monospace">−</text>
+                                <text x="140" y="119" fill="#e2e8f0" font-size="9" font-weight="bold" text-anchor="middle" font-family="Fira Code, monospace">S0</text>
+
+                                <!-- S1 -->
+                                <circle cx="240" cy="60" r="20" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+                                <text x="240" y="64" fill="#e2e8f0" font-size="9" font-weight="bold" text-anchor="middle" font-family="Fira Code, monospace">S1</text>
+
+                                <!-- S2 -->
+                                <circle cx="240" cy="160" r="20" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+                                <text x="240" y="164" fill="#e2e8f0" font-size="9" font-weight="bold" text-anchor="middle" font-family="Fira Code, monospace">S2</text>
+
+                                <!-- S3 - active (highlighted) -->
+                                <circle class="dfa-node-circle node-active" cx="356" cy="60" r="20" fill="#1e3a8a" stroke="#60a5fa" stroke-width="2.5"/>
+                                <text x="356" y="57" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle" font-family="Fira Code, monospace">▶</text>
+                                <text x="356" y="68" fill="#fff" font-size="9" font-weight="bold" text-anchor="middle" font-family="Fira Code, monospace">S3</text>
+
+                                <!-- S4 - accept -->
+                                <circle cx="356" cy="160" r="20" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+                                <text x="356" y="164" fill="#e2e8f0" font-size="9" font-weight="bold" text-anchor="middle" font-family="Fira Code, monospace">S4</text>
+
+                                <!-- S5 - accept (double ring) -->
+                                <circle cx="436" cy="110" r="20" fill="#064e3b" stroke="#10b981" stroke-width="2"/>
+                                <circle cx="436" cy="110" r="15" fill="none" stroke="#10b981" stroke-width="1" opacity="0.5"/>
+                                <text x="436" y="107" fill="#34d399" font-size="11" font-weight="bold" text-anchor="middle" font-family="sans-serif">+</text>
+                                <text x="436" y="117" fill="#34d399" font-size="9" font-weight="bold" text-anchor="middle" font-family="Fira Code, monospace">S5</text>
+                            </svg>
+                        </div>
+
+                        <!-- Subtle overlay text -->
+                        <div style="position:absolute; bottom:12px; right:16px; font-size:10px; color:#334155; font-family:'Fira Code', monospace; letter-spacing:0.05em;">
+                            trace active · step 3/7
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </main>
 
+    <!-- Footer -->
+    <footer>
+        <p>Built by <strong style="color:var(--text)">ATMTA Team</strong> · <a href="DFA_Tester.html">Launch App →</a></p>
+    </footer>
 </body>
-
 </html>
