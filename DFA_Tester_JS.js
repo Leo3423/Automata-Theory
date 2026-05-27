@@ -265,7 +265,7 @@ const automataData = {
             { from: 'R1', to: 'R4', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '0 ' },
             { from: 'R2', to: 'R5', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '1 ', isCustomPath: true, path: 'M 282.5 360 C 250 420, 350 510, 422.5 540', labelX: 295, labelY: 450 },
             { from: 'R2', to: 'R6', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '0 ' },
-            { from: 'R3', to: 'R7', sideFrom: 'right', sideTo: 'left', label: '1 ' },
+            { from: 'R3', to: 'R7', sideFrom: 'right', sideTo: 'left', label: '1 ', labelX: 560, labelY: 142 },
             { from: 'R3', to: 'R8', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '0 ', isCustomPath: true, path: 'M 440 170 C 400 300, 480 480, 562.5 540', labelX: 415, labelY: 340 },
             { from: 'R4', to: 'R9', sideFrom: 'right', sideTo: 'left', label: '1 ' },
             { from: 'R4', to: 'R6', sideFrom: 'bottomRight', sideTo: 'topLeft', label: '0 ' },
